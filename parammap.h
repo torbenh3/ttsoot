@@ -9,29 +9,33 @@
 
 class Block;
 
-class paramMap
+
+class Parameter
 {
+    public:
+	typedef boost::function<void(float)> setter_t; 
+
     private:
-	typedef std::map<std::string, float *> ref_map_t;
-	typedef std::map<std::string, boost::function<void(float)>> sideeffect_map_t;
+	float * val_ptr;
+	setter_t setter;
+    public:
+	Parameter() {}
+	Parameter( float *ptr, float def, float min, float max );
+	Parameter( float *ptr, setter_t setter, float def, float min, float max );
 
-	ref_map_t ref_map;
-	sideeffect_map_t sideeffect_map;
+	float get() { return * val_ptr; }
+	void set( float val ) { if(setter) setter(val); else *val_ptr = val; }
 
+	float min, max, def;
+};
+
+class paramMap : public std::map<std::string, Parameter>
+{
     public:
 	paramMap( Block & b );
 	paramMap();
 
-	ref_map_t::iterator begin() { return ref_map.begin(); }
-	ref_map_t::iterator end()  { return ref_map.end(); }
-
-	float get( std::string key );
-	void set( std::string key, float val );
-
-	float & get_ref( std::string key );
-
-	void add_param( std::string key, float &ref );
-	void add_param( std::string key, float &ref, boost::function<void(float)> sideffect );
+	void add_param( std::string key, Parameter param );
 };
 
 #endif

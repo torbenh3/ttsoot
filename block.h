@@ -189,12 +189,12 @@ class Mul : public Block
 };
 
 template<const char *Name>
-class Parameter : public Block
+class Param : public Block
 {
     private:
 	float _param;
     public:
-	Parameter() {
+	Param() {
 	    _param = 1.0;
 	}
 	inline float process() {
@@ -203,13 +203,13 @@ class Parameter : public Block
 	inline void reset() {}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    map.add_param( prefix + "/" + Name, _param );
+	    map.add_param( prefix + "/" + Name, Parameter( &_param, 1.0, 0.0, 1.0 ) );
 	}
 };
 
 extern char gain_name[];
 template<typename T>
-class Gain : public Mul<T,Parameter<gain_name>> {};
+class Gain : public Mul<T,Param<gain_name>> {};
 
 template<int MaxLine>
 class Delay
@@ -234,7 +234,7 @@ class Delay
 	inline void reset() { }
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    map.add_param( prefix + "/delay", _samples );
+	    map.add_param( prefix + "/delay", Parameter( &_samples, 10.0, 1.0, 1023.0 ) );
 	}
 };
 

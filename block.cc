@@ -11,7 +11,7 @@ SinOsc::SinOsc()
 void
 SinOsc::register_params( paramMap &map, std::string prefix )
 {
-    map.add_param( prefix + "/omega", _omega );
+    map.add_param( prefix + "/omega", Parameter( &_omega, 0.05, 0.01, 1.0 ) );
 }
 
 char gain_name[] = "gain";
