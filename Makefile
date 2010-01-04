@@ -1,10 +1,10 @@
 
 
-CXXFLAGS=-O3 -fargument-noalias-anything -funsafe-math-optimizations `pkg-config --cflags jack` --std=gnu++0x
-LDFLAGS=`pkg-config --libs jack`
+CXXFLAGS=-O3 -fargument-noalias-anything -funsafe-math-optimizations `pkg-config --cflags jack gtkmm-2.4` --std=gnu++0x
+LDFLAGS=`pkg-config --libs jack gtkmm-2.4`
 CXX=g++-4.4
 
-OBJECTS=block.o main.o process.o parammap.o
+OBJECTS=block.o main.o process.o parammap.o gui.o
 
 all: ttsoot process.s
 

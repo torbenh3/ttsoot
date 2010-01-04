@@ -8,11 +8,12 @@
 #include "time.h" 
 
 #include "process.h"
+#include "gui.h"
 
 jack_port_t *out_port;
 
 
-
+dsp engine;
 
 
 int process( jack_nframes_t nframes, void *arg )
@@ -20,7 +21,7 @@ int process( jack_nframes_t nframes, void *arg )
 
     float * buf = (float *) jack_port_get_buffer( out_port, nframes );
 
-    fill_channel( buf, nframes );
+    engine.fill_channel( buf, nframes );
 
     return 0;
 }
@@ -29,16 +30,18 @@ int process( jack_nframes_t nframes, void *arg )
 void dump()
 {
     float buf[DUMP_SIZE];
-    fill_channel( buf, DUMP_SIZE );
+    engine.fill_channel( buf, DUMP_SIZE );
     for( int i=0; i<DUMP_SIZE; i++ )
 	printf( "%d %f\n", i, buf[i] );
 }
 
 int main( int argc, char **argv )
 {
+    Gtk::Main kit( argc, argv );
+
     if( (argc==2) && (strcmp( argv[1], "dump" )==0) ) {
 
-	dump_params();
+	engine.dump_params();
 	dump();
 	return 0;
     }
@@ -50,6 +53,8 @@ int main( int argc, char **argv )
     jack_set_process_callback( client, process, 0 );
     jack_activate( client );
 
-    while(1)
-	sleep(1);
+    mainWin mw( engine.get_params() );
+    Gtk::Main::run( mw );
+
+    jack_client_close( client );
 }
