@@ -1,18 +1,10 @@
-#ifndef BLOCK_HH
-#define BLOCK_HH
+#ifndef CONTAINERS_HH
+#define CONTAINERS_HH
 
 #include <cmath>
-#include <map>
-#include <string>
 #include <boost/lexical_cast.hpp>
-#include "parammap.h"
 
-
-class Block
-{
-    public:
-	virtual void register_params( paramMap &map, std::string prefix ) = 0;
-};
+#include "block.h"
 
 
 template<typename ... Args>
@@ -163,56 +155,6 @@ class Mul : public Block
 	}
 	virtual void register_params( paramMap &map, std::string prefix ) {
 	    register_params( map, prefix + "/Mul/", 0 );
-	}
-};
-
-template<const char *Name>
-class Param : public Block
-{
-    private:
-	float _param;
-    public:
-	Param() {
-	    _param = 1.0;
-	}
-	inline float process() {
-	    return _param;
-	}
-	inline void reset() {}
-
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    map.add_param( prefix + "/" + Name, Parameter( &_param, 1.0, 0.0, 1.0 ) );
-	}
-};
-
-extern char gain_name[];
-template<typename T>
-class Gain : public Mul<T,Param<gain_name>> {};
-
-template<int MaxLine>
-class Delay
-{
-    private:
-	float _samples;
-	int _phase;
-	float _line[MaxLine];
-    public:
-	Delay() {
-	    _samples = 10.0;
-	    _phase = 0;
-	    for( int i=0; i<MaxLine; i++ )
-		_line[i] = 0.0;
-	}
-	inline float process( float s) {
-	    int del = int(_samples);
-	    _phase += 1;
-	    _line[_phase&(MaxLine-1)] = s;
-	    return _line[(_phase - del)&(MaxLine-1)];
-	}
-	inline void reset() { }
-
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    map.add_param( prefix + "/delay", Parameter( &_samples, 10.0, 1.0, 1023.0 ) );
 	}
 };
 

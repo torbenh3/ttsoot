@@ -3,11 +3,15 @@
 
 #include <jack/jack.h>
 #include "block.h"
+#include "containers.h"
+#include "effects.h"
+#include "oscilators.h"
+#include "basicblocks.h"
 
 class dsp {
     private:
 	paramMap params;
-	Sequence< Gain<SinOsc>, Delay<128> > osc_block;
+	Sequence< SinOsc, Gain, Delay<128> > osc_block;
     public:
 	dsp();
 

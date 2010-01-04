@@ -4,7 +4,7 @@ CXXFLAGS=-O3 -fargument-noalias-anything -funsafe-math-optimizations `pkg-config
 LDFLAGS=`pkg-config --libs jack gtkmm-2.4`
 CXX=g++-4.4
 
-OBJECTS=block.o main.o process.o parammap.o gui.o gui_adjustment.o
+OBJECTS=main.o process.o parammap.o gui.o gui_adjustment.o oscilators.o basicblocks.o
 
 all: ttsoot process.s
 
