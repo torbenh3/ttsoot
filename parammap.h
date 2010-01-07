@@ -31,11 +31,18 @@ class Parameter
 
 class paramMap : public std::map<std::string, Parameter>
 {
+    private:
+	std::map<std::string, Block *> block_map;
     public:
 	paramMap( Block & b );
 	paramMap();
 
 	void add_param( std::string key, Parameter param );
+	void add_this( std::string key, Block *b );
+
+	Block *get_block( std::string key );
+
+	void dump();
 };
 
 #endif

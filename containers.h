@@ -25,6 +25,10 @@ class Mixer<T1, Args...> : public Block
 	    t1.reset();
 	    t2.reset();
 	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
+	}
 	void register_params( paramMap &map, std::string prefix, int num ) {
 	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
 	    t2.register_params( map, prefix, num+1 );
@@ -47,6 +51,10 @@ class Mixer<T1,T2> : public Block
 	inline void reset() {
 	    t1.reset();
 	    t2.reset();
+	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
 	}
 
 	virtual void register_params( paramMap &map, std::string prefix, int num ) {
@@ -75,6 +83,10 @@ class PMixer<T1, Args...> : public Block
 	    t1.reset();
 	    t2.reset();
 	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
+	}
 
 	void register_params( paramMap &map, std::string prefix, int num ) {
 	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
@@ -98,6 +110,10 @@ class PMixer<T1,T2> : public Block
 	inline void reset() {
 	    t1.reset();
 	    t2.reset();
+	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
 	}
 
 	void register_params( paramMap &map, std::string prefix, int num ) {
@@ -127,6 +143,10 @@ class Parallel<IN, Args...> : public Block
 	    in.reset();
 	    pmix.reset();
 	}
+	inline void prep() {
+	    in.prep();
+	    pmix.prep();
+	}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
 	    in.register_params( map, prefix + "/in" );
@@ -147,6 +167,10 @@ class Mul : public Block
 	inline void reset() {
 	    t1.reset();
 	    t2.reset();
+	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
 	}
 
 	void register_params( paramMap &map, std::string prefix, int num ) {
@@ -176,9 +200,13 @@ class Chain<T1, Args...>
 	    t1.reset();
 	    t2.reset();
 	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
+	}
 	void register_params( paramMap &map, std::string prefix, int num ) {
 	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix + boost::lexical_cast<std::string> (num+1) );
+	    t2.register_params( map, prefix, num+1 );
 	}
 	virtual void register_params( paramMap &map, std::string prefix ) {
 	    register_params( map, prefix + "/", 0 );
@@ -197,6 +225,9 @@ class Chain<T1>
 
 	inline void reset() {
 	    t1.reset();
+	}
+	inline void prep() {
+	    t1.prep();
 	}
 	void register_params( paramMap &map, std::string prefix, int num ) {
 	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
@@ -223,6 +254,10 @@ class Sequence<IN, Args ...>
 	inline void reset() {
 	    in.reset();
 	    t1.reset();
+	}
+	inline void prep() {
+	    in.prep();
+	    t1.prep();
 	}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {

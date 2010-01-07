@@ -8,21 +8,28 @@
 
 #include "process.h"
 
-//Mixer<Gain<SinOsc>, Gain<SinOsc>, Gain<SinOsc>, Gain<SinOsc>> osc_block;
+//Sequence< BLSawOsc, Gain > osc_block;
+//Sequence< QuadSinOsc, Gain > osc_block;
+//typedef Sequence<JackInPort, Feedback<Chain<Z1, Z1, Z1, Z1>>, Gain> block_t;
+typedef Parallel<JackInPort, Feedback<Chain<Delay<1024>, Gain>>, Gain> block_t;
 
-//Sequence< Gain<SinOsc>, Delay<128> > osc_block;
 
-dsp::dsp() {
+
+block_t osc_block __attribute__((restrict));
+
+
+dsp::dsp( jack_port_t *in_port, jack_nframes_t nframes ) {
     osc_block.register_params( params, "" );
+    //InBuffer *inbuf = dynamic_cast<InBuffer *>( params.get_block( "/in/InBuf" ) );
+    //buffer = inbuf->get_buf_ptr();
+    //*buffer = new float[1024];
+    JackInPort *inbuf = dynamic_cast<JackInPort *>( params.get_block( "/in/InBuf" ) );
+    inbuf->set_port_and_nframes( in_port, nframes );
 }
 
 void 
 dsp::dump_params() {
-
-    for( auto i=params.begin(); i!=params.end(); i++ )
-    {
-	std::cout << i->first << std::endl;
-    }
+    params.dump();
 }
 
 paramMap &
@@ -31,10 +38,11 @@ dsp::get_params() {
 }
 
 void 
-dsp::fill_channel( float * buf, jack_nframes_t nframes )
+dsp::fill_channel( float * __restrict__ buf, jack_nframes_t nframes )
 {
     int i;
 
+    osc_block.prep();
     for( i=0; i<nframes; i++ ) {
 	*buf = osc_block.process(); 
 	buf++;

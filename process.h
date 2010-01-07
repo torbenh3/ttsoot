@@ -11,9 +11,9 @@
 class dsp {
     private:
 	paramMap params;
-	Sequence< SinOsc, Gain, Delay<128> > osc_block;
+	float **buffer;
     public:
-	dsp();
+	dsp( jack_port_t *port, jack_nframes_t nframes );
 
 	paramMap & get_params();
 	void fill_channel( float * __restrict__ buf, jack_nframes_t nframes );

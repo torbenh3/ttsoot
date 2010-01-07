@@ -2,6 +2,9 @@
 #define BASICBLOCKS_H
 
 #include "block.h"
+#include "containers.h"
+
+#include "jack/jack.h"
 
 template<const char *Name>
 class Param : public Block
@@ -15,15 +18,23 @@ class Param : public Block
 	inline float process() {
 	    return _param;
 	}
-	inline void reset() {}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
 	    map.add_param( prefix + "/" + Name, Parameter( &_param, 1.0, 0.0, 1.0 ) );
 	}
 };
 
+template<int val>
+class ConstInt : public Block
+{
+    public:
+	inline float process() {
+	    return (float) val;
+	}
+};
+
 template<typename T1>
-class Modulate
+class Modulate : public Block
 {
     private:
 	T1 t1;
@@ -35,14 +46,110 @@ class Modulate
 	inline void reset() {
 	    t1.reset();
 	}
+	inline void prep() {
+	    t1.prep();
+	}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
 	    t1.register_params( map, prefix + "/mod" );
 	}
 };
 
+class InBuffer : public Block
+{
+    protected:
+	float * __restrict__ _buf;
+	unsigned int k;
+
+    public:
+	InBuffer() {
+	    _buf = 0;
+	    k=0;
+	}
+	inline float process() {
+	    return _buf[k++];
+	}
+	inline void reset() {}
+
+	inline void prep() {
+	    k=0;
+       	}
+
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    map.add_this( prefix + "/InBuf", this );
+	}
+
+	float **get_buf_ptr() { return (float **) &_buf; }
+};
+
+class JackInPort : public InBuffer
+{
+    private:
+	jack_port_t *_port;
+	jack_nframes_t _nframes;
+    public:
+	inline void prep() {
+	    _buf = (float *) jack_port_get_buffer( _port, _nframes );
+	    k=0;
+	}
+
+	void set_port_and_nframes( jack_port_t *port, jack_nframes_t nframes )
+	{
+	    _port = port;
+	    _nframes = nframes;
+	}
+};
+
+class Z1 : public Block
+{
+    private:
+	float k_1;
+    public:
+	Z1() { k_1 = 0.0; }
+	inline float process( float s ) {
+	    float tmp = k_1;
+	    k_1 = s;
+	    return tmp;
+	}
+	inline void reset() { k_1 = 0.0; }
+};
+
+template<typename T1>
+class Feedback : public Block
+{
+    private:
+	T1 t1;
+	float k_1;
+    public:
+	inline float process( float s ) {
+	    float tmp = k_1;
+	    k_1 = t1.process( s + k_1 );
+	    return tmp;
+	}
+	inline void reset() {
+	    t1.reset();
+	}
+	inline void prep() {
+	    t1.prep();
+	}
+
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    t1.register_params( map, prefix + "/mod" );
+	}
+};
+
+class Smooth : public Block
+{
+    private:
+	float acc;
+    public:
+	Smooth() { acc = 0.0; }
+	inline float process( float s ) {
+	    acc = 0.99f*acc + 0.01f * s;
+	    return acc;
+	}
+};
+
 extern char gain_name[];
-class Gain : public Modulate<Param<gain_name>> {};
-
-
+class Gain : public Modulate< Sequence<Param<gain_name>,Smooth> > {};
 #endif
