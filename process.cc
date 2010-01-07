@@ -11,7 +11,7 @@
 //Sequence< BLSawOsc, Gain > osc_block;
 //Sequence< QuadSinOsc, Gain > osc_block;
 //typedef Sequence<JackInPort, Feedback<Chain<Z1, Z1, Z1, Z1>>, Gain> block_t;
-typedef Parallel<JackInPort, Feedback<Chain<Delay<1024>, Gain>>, Gain> block_t;
+typedef Sequence<JackInPort,Parallel<Feedback<Chain<Delay<1024>, Gain>>, Gain>> block_t;
 
 
 

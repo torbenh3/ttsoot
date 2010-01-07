@@ -6,48 +6,13 @@
 
 #include "block.h"
 
-
-template<typename ... Args>
-class Mixer;
-
-template<typename T1, typename ... Args>
-class Mixer<T1, Args...> : public Block
-{
-    private:
-	T1 t1;
-	Mixer<Args...> t2;
-    public:
-	inline float process() {
-	    return t1.process() + t2.process();
-	}
-
-	inline void reset() {
-	    t1.reset();
-	    t2.reset();
-	}
-	inline void prep() {
-	    t1.prep();
-	    t2.prep();
-	}
-	void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix, num+1 );
-	}
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    register_params( map, prefix, 0 );
-	}
-};
-
 template<typename T1, typename T2>
-class Mixer<T1,T2> : public Block
+class Container2 : public Block
 {
-    private:
+    protected:
 	T1 t1;
 	T2 t2;
     public:
-	inline float process() {
-	    return t1.process() + t2.process();
-	}
 	inline void reset() {
 	    t1.reset();
 	    t2.reset();
@@ -58,211 +23,137 @@ class Mixer<T1,T2> : public Block
 	}
 
 	virtual void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix + boost::lexical_cast<std::string> (num+1) );
+	    t1.register_params( map, prefix + "/" + boost::lexical_cast<std::string> (num) );
+	    t2.register_params( map, prefix + "/" + boost::lexical_cast<std::string> (num+1) );
 	}
 	virtual void register_params( paramMap &map, std::string prefix ) {
 	    register_params( map, prefix, 0 );
-	}
-};
-
-template<typename ... Args>
-class PMixer;
-
-template<typename T1, typename ... Args>
-class PMixer<T1, Args...> : public Block
-{
-    private:
-	T1 t1;
-	PMixer<Args...> t2;
-    public:
-	inline float process( float in) {
-	    return t1.process( in ) + t2.process( in );
-	}
-	inline void reset() {
-	    t1.reset();
-	    t2.reset();
-	}
-	inline void prep() {
-	    t1.prep();
-	    t2.prep();
-	}
-
-	void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix, num+1 );
-	}
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    register_params( map, prefix, 0 );
-	}
-};
-
-template<typename T1, typename T2>
-class PMixer<T1,T2> : public Block
-{
-    private:
-	T1 t1;
-	T2 t2;
-    public:
-	inline float process( float in) {
-	    return t1.process( in ) + t2.process( in );
-	}
-	inline void reset() {
-	    t1.reset();
-	    t2.reset();
-	}
-	inline void prep() {
-	    t1.prep();
-	    t2.prep();
-	}
-
-	void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix + boost::lexical_cast<std::string> (num+1) );
-	}
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    register_params( map, prefix + "/", 0 );
-	}
-};
-
-
-template<typename ... Args> 
-class Parallel;
-
-template<typename IN, typename ... Args>
-class Parallel<IN, Args...> : public Block
-{
-    private:
-	IN in;
-	PMixer<Args...> pmix;
-    public:
-	inline float process() {
-	    return pmix.process( in.process() );
-	}
-	inline void reset() {
-	    in.reset();
-	    pmix.reset();
-	}
-	inline void prep() {
-	    in.prep();
-	    pmix.prep();
-	}
-
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    in.register_params( map, prefix + "/in" );
-	    pmix.register_params( map, prefix + "/path" );
-	}
-};
-
-template<typename T1, typename T2>
-class Mul : public Block
-{
-    private:
-	T1 t1;
-	T2 t2;
-    public:
-	inline float process() {
-	    return t1.process() * t2.process();
-	}
-	inline void reset() {
-	    t1.reset();
-	    t2.reset();
-	}
-	inline void prep() {
-	    t1.prep();
-	    t2.prep();
-	}
-
-	void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix + boost::lexical_cast<std::string> (num+1) );
-	}
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    register_params( map, prefix + "/Mul/", 0 );
-	}
-};
-
-template<typename ... Args>
-class Chain;
-
-template<typename T1, typename ... Args>
-class Chain<T1, Args...>
-{
-    private:
-	T1 t1;
-	Chain<Args...> t2;
-    public:
-	inline float process( float s ) {
-	    return t2.process( t1.process( s ) );
-	}
-
-	inline void reset() {
-	    t1.reset();
-	    t2.reset();
-	}
-	inline void prep() {
-	    t1.prep();
-	    t2.prep();
-	}
-	void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
-	    t2.register_params( map, prefix, num+1 );
-	}
-	virtual void register_params( paramMap &map, std::string prefix ) {
-	    register_params( map, prefix + "/", 0 );
 	}
 };
 
 template<typename T1>
-class Chain<T1>
+class Container1 : public Block
 {
-    private:
+    protected:
 	T1 t1;
     public:
-	inline float process( float s ) {
-	    return t1.process( s );
-	}
-
 	inline void reset() {
 	    t1.reset();
 	}
 	inline void prep() {
 	    t1.prep();
 	}
-	void register_params( paramMap &map, std::string prefix, int num ) {
-	    t1.register_params( map, prefix + boost::lexical_cast<std::string> (num) );
+
+	virtual void register_params( paramMap &map, std::string prefix, int num ) {
+	    t1.register_params( map, prefix + "/" + boost::lexical_cast<std::string> (num) );
 	}
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    register_params( map, prefix + "/", 0 );
+	    register_params( map, prefix, 0 );
 	}
 };
+
+template<template<typename ... BaseArgs> class Base, typename ... Args>
+class ChainedContainer;
+
+template<template<typename ... BaseArgs> class Base, typename T1, typename ... Args>
+class ChainedContainer<Base, T1, Args...> : public Block
+{
+    protected:
+	T1 t1;
+	Base<Args...> t2;
+    public:
+	inline void reset() {
+	    t1.reset();
+	    t2.reset();
+	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
+	}
+	void register_params( paramMap &map, std::string prefix, int num ) {
+	    t1.register_params( map, prefix + "/" + boost::lexical_cast<std::string> (num) );
+	    t2.register_params( map, prefix, num+1 );
+	}
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    register_params( map, prefix, 0 );
+	}
+};
+
+template<template<typename ... BaseArgs> class Base, typename T1, typename T2>
+class ChainedContainer<Base, T1, T2> : public Block
+{
+    protected:
+	T1 t1;
+	T2 t2;
+    public:
+	inline void reset() {
+	    t1.reset();
+	    t2.reset();
+	}
+	inline void prep() {
+	    t1.prep();
+	    t2.prep();
+	}
+	void register_params( paramMap &map, std::string prefix, int num ) {
+	    t1.register_params( map, prefix + "/" + boost::lexical_cast<std::string> (num)  );
+	    t2.register_params( map, prefix + "/" + boost::lexical_cast<std::string> (num+1) );
+	}
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    register_params( map, prefix, 0 );
+	}
+};
+
+template<typename ... Args>
+class Mixer : public ChainedContainer<Mixer, Args...>
+{
+    public:
+	inline float process() {
+	    return this->t1.process() + this->t2.process();
+	}
+};
+
+template<typename ... Args>
+class Parallel : public ChainedContainer<Parallel, Args...>
+{
+    public:
+	inline float process( float s ) {
+	    return this->t1.process( s ) + this->t2.process( s );
+	}
+};
+
+template<typename ... Args>
+class Chain : public ChainedContainer<Chain, Args...>
+{
+    public:
+	inline float process( float s ) {
+	    return this->t2.process( this->t1.process( s ) );
+	}
+};
+
+template<typename T1>
+class Chain<T1> : public Container1<T1>
+{
+    public:
+	inline float process( float s ) {
+	    return this->t1.process( s );
+	}
+};
+
 
 template<typename ... Args>
 class Sequence;
 
 template<typename IN, typename ... Args>
-class Sequence<IN, Args ...>
+class Sequence<IN, Args ...> : public Container2<IN, Chain<Args...> >
 {
-    private:
-	IN in;
-	Chain<Args...> t1;
     public:
 	inline float process() {
-	    return t1.process( in.process() );
-	}
-
-	inline void reset() {
-	    in.reset();
-	    t1.reset();
-	}
-	inline void prep() {
-	    in.prep();
-	    t1.prep();
+	    return this->t2.process( this->t1.process() );
 	}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    t1.register_params( map, prefix + "/chain" );
-	    in.register_params( map, prefix + "/in" );
+	    this->t1.register_params( map, prefix + "/in" );
+	    this->t2.register_params( map, prefix + "/chain" );
 	}
 };
 
