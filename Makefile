@@ -1,8 +1,8 @@
 
 
-CXXFLAGS=-O3 -fargument-noalias-anything -funsafe-math-optimizations `pkg-config --cflags jack gtkmm-2.4` --std=gnu++0x
+CXXFLAGS=-O3 -ffast-math -fgcse-sm -march=core2 -funsafe-math-optimizations `pkg-config --cflags jack gtkmm-2.4` -std=gnu++0x
 LDFLAGS=`pkg-config --libs jack gtkmm-2.4`
-CXX=g++-4.4
+CXX=/opt/gcc/bin/g++
 
 OBJECTS=main.o process.o parammap.o gui.o gui_adjustment.o oscilators.o basicblocks.o
 
@@ -15,7 +15,7 @@ ttsoot: $(OBJECTS)
 	$(CXX) -MD -MF .deps/$(@:.o=.d) -c $(CXXFLAGS) -o $@ $<
 
 %.s:%.cc
-	$(CXX) -S $(CXXFLAGS) -o $@ $<
+	$(CXX) -S $(CXXFLAGS)  -o $@ $<
 
 .PHONY: clean
 clean:
