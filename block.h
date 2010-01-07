@@ -6,7 +6,10 @@
 class Block
 {
     public:
-	virtual void register_params( paramMap &map, std::string prefix ) = 0;
+	virtual void register_params( paramMap &map, std::string prefix ) {}
+
+	inline void reset() {}
+	inline void prep() {}
 };
 
 #endif
