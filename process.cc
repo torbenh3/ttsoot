@@ -7,16 +7,18 @@
 #include "time.h" 
 
 #include "process.h"
+#include "filters.h"
 
 //Sequence< BLSawOsc, Gain > osc_block;
 //typedef Sequence< QuadSinOsc, Gain > block_t;
 //typedef Sequence<JackInPort, Feedback<Chain<Z1, Z1, Z1, Z1>>, Gain> block_t;
 //typedef Sequence<JackInPort,Parallel<Feedback<Chain<Delay<1024>, Gain>>, Gain>> block_t;
 
-typedef Sequence< VarBLSaw, Gain > block_t;
+//typedef Sequence< VarBLSaw, Gain > block_t;
 
 //typedef Sequence< QuadSinOsc, Gain > block_t;
 
+typedef Sequence<JackInPort, BiQuadLP, Gain> block_t;
 block_t osc_block __attribute__((restrict));
 
 
@@ -25,8 +27,9 @@ dsp::dsp( jack_port_t *in_port, jack_nframes_t nframes ) {
     //InBuffer *inbuf = dynamic_cast<InBuffer *>( params.get_block( "/in/InBuf" ) );
     //buffer = inbuf->get_buf_ptr();
     //*buffer = new float[1024];
-    //JackInPort *inbuf = dynamic_cast<JackInPort *>( params.get_block( "/in/InBuf" ) );
-    //inbuf->set_port_and_nframes( in_port, nframes );
+    JackInPort *inbuf = dynamic_cast<JackInPort *>( params.get_block( "/in/InBuf" ) );
+    if( inbuf )
+	inbuf->set_port_and_nframes( in_port, nframes );
 }
 
 void 
