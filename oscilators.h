@@ -4,6 +4,7 @@
 #include "block.h"
 #include "basicblocks.h"
 #include "containers.h"
+#include <cmath>
 
 class SinOsc : public Block
 {
@@ -51,6 +52,26 @@ class VarSinOsc : public Block
 	    _cos = 1.0;
 	}
 };
+
+class VarSinOsc_real : public Block
+{
+    private:
+	float _phase;
+    public:
+	VarSinOsc_real() {
+	    _phase = 0.0;
+	}
+	inline float process( float s ) {
+
+	    _phase += s;
+	    return  std::sin( _phase );
+	}
+
+	inline void reset() {
+	    _phase = 0.0;
+	}
+};
+
 
 class OmegaParm : public Block
 {
