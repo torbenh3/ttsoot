@@ -46,4 +46,34 @@ class BiQuadLP : public BiQuadForm1
 	void set_bw( float b );
 };
 
+class BiQuadHP : public BiQuadForm1
+{
+    private:
+	float _cutoff;
+	float _bw;
+    public:
+
+	virtual void register_params( paramMap &map, std::string prefix );
+	void update_coeffs();
+	void set_cutoff( float f );
+	void set_bw( float b );
+};
+
+class FlipFlop : public Block
+{
+    private:
+	float x_1;
+	float y_1;
+    public:
+	FlipFlop() { x_1=0; y_1 = 1.0; }
+	float process( float s )
+	{
+	    if( (x_1 < 0.5) && (s > 0.5) )
+		y_1 = -1.0*y_1; 
+	    x_1 = s;
+
+	    return y_1;
+	}
+};
+
 #endif
