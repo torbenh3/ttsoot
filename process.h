@@ -3,10 +3,6 @@
 
 #include <jack/jack.h>
 #include "block.h"
-#include "containers.h"
-#include "effects.h"
-#include "oscilators.h"
-#include "basicblocks.h"
 
 class dsp {
     private:
