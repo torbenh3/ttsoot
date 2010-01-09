@@ -24,6 +24,20 @@ SinOsc::set_freq( float f )
     _omega = f * 2.0*M_PI/48000.0;
 }
 
+void
+OmegaParm::register_params( paramMap &map, std::string prefix )
+{
+    //map.add_param( prefix + "/omega", Parameter( &_omega, 0.05, 0.01, 1.0 ) );
+    map.add_param( prefix + "/freq", Parameter( &_freq, boost::bind( &OmegaParm::set_freq, this, _1 ), 100.0, 20.0, 10000.0 ) );
+}
+
+void
+OmegaParm::set_freq( float f )
+{
+    _freq = f;
+    _omega = f * 2.0*M_PI/48000.0;
+}
+
 QuadSinOsc::QuadSinOsc()
 {
     for( int i=0; i<4; i++ ) {

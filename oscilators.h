@@ -29,6 +29,44 @@ class SinOsc : public Block
 	void set_freq( float f );
 };
 
+class VarSinOsc : public Block
+{
+    private:
+	float _sin;
+	float _cos;
+    public:
+	VarSinOsc() {
+	    _sin = 0.0;
+	    _cos = 1.0;
+	}
+	inline float process( float s ) {
+
+	    _sin = _sin + s * _cos;
+	    _cos = _cos - s * _sin;
+	    return  _sin;
+	}
+
+	inline void reset() {
+	    _sin = 0.0;
+	    _cos = 1.0;
+	}
+};
+
+class OmegaParm : public Block
+{
+    private:
+	float _omega;
+	float _freq;
+
+    public:
+	inline float process() {
+	    return _omega;
+	}
+
+	virtual void register_params( paramMap &map, std::string prefix );
+	void set_freq( float f );
+};
+
 typedef float v4fs __attribute__((vector_size(16)));
 
 typedef union { float a[4]; v4fs v; } v4f;
@@ -78,5 +116,12 @@ class BLSawOsc : public QuadOscBase
 	virtual void register_params( paramMap &map, std::string prefix );
 	void set_freq( float f );
 };
+
+typedef Parallel< Chain < Modulate<ConstInt<1>> ,VarSinOsc, Modulate <ConstFract<1,1>> >,
+	          Chain < Modulate<ConstInt<2>> ,VarSinOsc, Modulate <ConstFract<1,2>> >,
+	          Chain < Modulate<ConstInt<3>> ,VarSinOsc, Modulate <ConstFract<1,3>> >,
+	          Chain < Modulate<ConstInt<4>> ,VarSinOsc, Modulate <ConstFract<1,4>> > > BLVarSawBase;
+
+class VarBLSaw : public Sequence<OmegaParm,BLVarSawBase> {};
 
 #endif
