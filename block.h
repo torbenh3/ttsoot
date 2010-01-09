@@ -6,6 +6,7 @@
 class Block
 {
     public:
+	static float fs;
 	virtual void register_params( paramMap &map, std::string prefix ) {}
 
 	inline void reset() {}
