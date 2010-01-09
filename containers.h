@@ -121,6 +121,7 @@ class Parallel : public ChainedContainer<Parallel, Args...>
 	}
 };
 
+
 template<typename ... Args>
 class Chain : public ChainedContainer<Chain, Args...>
 {
@@ -157,5 +158,27 @@ class Sequence<IN, Args ...> : public Container2<IN, Chain<Args...> >
 	}
 };
 
+template<typename ... Args>
+class Cascade;
+
+template<typename C, typename T1, typename ... Args>
+class Cascade<C, T1, Args...> : public Container2<T1, Cascade<C, Args...> >
+{
+    protected:
+	C c1;
+    public:
+	inline float process( float s ) {
+	    return this->t1.process( s ) + this->t2.process( this->c1.process( s ) );
+	}
+};
+
+template<typename C1, typename T1>
+class Cascade<C1,T1> : public Container1<T1>
+{
+    public:
+	inline float process( float s ) {
+	    return this->t1.process( s );
+	}
+};
 #endif
 
