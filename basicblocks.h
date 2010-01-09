@@ -33,25 +33,25 @@ class ConstInt : public Block
 	}
 };
 
-template<typename T1>
-class Modulate : public Block
+template<int num, int denom>
+class ConstFract : public Block
 {
-    private:
-	T1 t1;
+    public:
+	inline float process() {
+	    return (float) num / (float) denom;
+	}
+};
+
+template<typename T1>
+class Modulate : public Container1<T1>
+{
     public:
 	inline float process( float s ) {
-	    return t1.process() * s;
-	}
-
-	inline void reset() {
-	    t1.reset();
-	}
-	inline void prep() {
-	    t1.prep();
+	    return this->t1.process() * s;
 	}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    t1.register_params( map, prefix + "/mod" );
+	    this->t1.register_params( map, prefix + "/mod" );
 	}
 };
 
@@ -69,7 +69,6 @@ class InBuffer : public Block
 	inline float process() {
 	    return _buf[k++];
 	}
-	inline void reset() {}
 
 	inline void prep() {
 	    k=0;
@@ -115,26 +114,19 @@ class Z1 : public Block
 };
 
 template<typename T1>
-class Feedback : public Block
+class Feedback : public Container1<T1>
 {
     private:
-	T1 t1;
 	float k_1;
     public:
 	inline float process( float s ) {
 	    float tmp = k_1;
-	    k_1 = t1.process( s + k_1 );
+	    k_1 = this->t1.process( s + k_1 );
 	    return tmp;
-	}
-	inline void reset() {
-	    t1.reset();
-	}
-	inline void prep() {
-	    t1.prep();
 	}
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    t1.register_params( map, prefix + "/mod" );
+	    this->t1.register_params( map, prefix + "/fb" );
 	}
 };
 
@@ -148,8 +140,15 @@ class Smooth : public Block
 	    acc = 0.99f*acc + 0.01f * s;
 	    return acc;
 	}
+	inline void reset() {
+	    acc = 0.0;
+	}
 };
 
 extern char gain_name[];
-class Gain : public Modulate< Sequence<Param<gain_name>,Smooth> > {};
+class Gain : public Modulate< Param<gain_name> > {};
+
+class SmoothGain : public Modulate< Sequence<Param<gain_name>,Smooth> > {};
+
+
 #endif
