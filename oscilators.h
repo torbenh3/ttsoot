@@ -72,6 +72,32 @@ class VarSinOsc_real : public Block
 	}
 };
 
+class PhaseGen : public Block
+{
+    private:
+	float _phase;
+    public:
+	PhaseGen() {
+	    _phase = 0.0;
+	}
+	inline float process( float s ) {
+	    _phase += s;
+	    if( _phase >= 2.0f*M_PI )
+		_phase -= 2.0f*M_PI;
+	    return _phase;
+	}
+	inline void reset() {
+	    _phase = 0.0;
+	}
+};
+
+class Sin : public Block
+{
+    public:
+	inline float process( float s ) {
+	    return std::sin( s );
+	}
+};
 
 class OmegaParm : public Block
 {
@@ -144,5 +170,12 @@ typedef Parallel< Chain < Modulate<ConstInt<1>> ,VarSinOsc, Modulate <ConstFract
 	          Chain < Modulate<ConstInt<4>> ,VarSinOsc, Modulate <ConstFract<1,4>> > > BLVarSawBase;
 
 class VarBLSaw : public Sequence<OmegaParm,BLVarSawBase> {};
+
+typedef Parallel< Chain < Modulate<ConstInt<1>> ,Sin, Modulate <ConstFract<1,1>> >,
+	          Chain < Modulate<ConstInt<2>> ,Sin, Modulate <ConstFract<1,2>> >,
+	          Chain < Modulate<ConstInt<3>> ,Sin, Modulate <ConstFract<1,3>> >,
+	          Chain < Modulate<ConstInt<4>> ,Sin, Modulate <ConstFract<1,4>> > > SlowBLVarSawBase;
+
+class SlowVarBLSaw : public Sequence<OmegaParm, PhaseGen, SlowBLVarSawBase> {};
 
 #endif
