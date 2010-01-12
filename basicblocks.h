@@ -145,6 +145,14 @@ class Smooth : public Block
 	}
 };
 
+class Clamp : public Block
+{
+    public:
+	inline float process( float s ) {
+	    return std::min( std::max( s, -1.0f ), 1.0f );
+	}
+};
+
 extern char gain_name[];
 class Gain : public Modulate< Param<gain_name> > {};
 
