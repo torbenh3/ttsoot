@@ -27,6 +27,7 @@ class fvec
 	}
 
 	float & operator[] ( unsigned int index ) { return _vec[index]; }
+	const float & operator[] ( unsigned int index ) const { return _vec[index]; }
 
 	fvec<N> & operator*= ( float f ) {
 	    for( int i=0; i<N; i++ )
