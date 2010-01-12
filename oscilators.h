@@ -6,7 +6,7 @@
 #include "containers.h"
 #include <cmath>
 
-class SinOsc : public Block
+class SinOsc : public GenBlock
 {
     private:
 	float _sin;
@@ -30,7 +30,7 @@ class SinOsc : public Block
 	void set_freq( float f );
 };
 
-class VarSinOsc : public Block
+class VarSinOsc : public FBlock
 {
     private:
 	float _sin;
@@ -72,7 +72,7 @@ class VarSinOsc_real : public Block
 	}
 };
 
-class PhaseGen : public Block
+class PhaseGen : public FBlock
 {
     private:
 	float _phase;
@@ -91,7 +91,7 @@ class PhaseGen : public Block
 	}
 };
 
-class Sin : public Block
+class Sin : public FBlock
 {
     public:
 	inline float process( float s ) {
@@ -99,7 +99,7 @@ class Sin : public Block
 	}
 };
 
-class OmegaParm : public Block
+class OmegaParm : public GenBlock
 {
     private:
 	float _omega;

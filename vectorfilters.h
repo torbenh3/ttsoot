@@ -3,32 +3,39 @@
 
 #include "containers.h"
 
-template<typename T1>
+template<int N, typename T1>
 class VectorMul : public Container1<T1>
 {
     public:
-	template<int N>
+	typedef fvec<N> output_t;
+	typedef fvec<N> input_t;
+
 	inline fvec<N> process( fvec<N> s )
 	{
 	    return s * this->t1.process();
 	}
 };
 
-template<typename T1>
+template<int N, typename T1>
 class VectorAdd : public Container1<T1>
 {
     public:
-	template<int N>
+	typedef fvec<N> output_t;
+	typedef fvec<N> input_t;
+
 	inline fvec<N> process( fvec<N> s )
 	{
 	    return s + this->t1.process();
 	}
 };
 
+template<int N>
 class VectorSum : public Block
 {
     public:
-	template<int N>
+	typedef float output_t;
+	typedef fvec<N> input_t;
+
 	inline float process( fvec<N> s )
 	{
 	    return s.sum();
@@ -39,6 +46,9 @@ template<int N>
 class VectorSplit : public Block
 {
     public:
+	typedef fvec<N> output_t;
+	typedef float input_t;
+
 	inline fvec<N> process( float s )
 	{
 	    return fvec<N>( s );
@@ -51,16 +61,22 @@ class VGain : public Block
     private:
 	fvec<N> _gain_vec;
     public:
+	typedef fvec<N> output_t;
+	typedef fvec<N> input_t;
+
 	inline fvec<N> process( fvec<N> s )
 	{
 	    return _gain_vec * s;
 	}
 };
 
+template<int N>
 class VClamp : public Block
 {
     public:
-	template<int N>
+	typedef fvec<N> output_t;
+	typedef fvec<N> input_t;
+
 	inline fvec<N> process( fvec<N> s )
 	{
 	    return s.clamp();

@@ -7,7 +7,7 @@
 #include "jack/jack.h"
 
 template<const char *Name>
-class Param : public Block
+class Param : public GenBlock
 {
     private:
 	float _param;
@@ -25,7 +25,7 @@ class Param : public Block
 };
 
 template<int val>
-class ConstInt : public Block
+class ConstInt : public GenBlock
 {
     public:
 	inline float process() {
@@ -34,7 +34,7 @@ class ConstInt : public Block
 };
 
 template<int num, int denom>
-class ConstFract : public Block
+class ConstFract : public GenBlock
 {
     public:
 	inline float process() {
@@ -46,6 +46,9 @@ template<typename T1>
 class Modulate : public Container1<T1>
 {
     public:
+	typedef float input_t;
+	typedef float output_t;
+
 	inline float process( float s ) {
 	    return this->t1.process() * s;
 	}
@@ -55,7 +58,7 @@ class Modulate : public Container1<T1>
 	}
 };
 
-class InBuffer : public Block
+class InBuffer : public GenBlock
 {
     protected:
 	float * __restrict__ _buf;
@@ -99,7 +102,7 @@ class JackInPort : public InBuffer
 	}
 };
 
-class Z1 : public Block
+class Z1 : public FBlock
 {
     private:
 	float k_1;
@@ -119,6 +122,9 @@ class Feedback : public Container1<T1>
     private:
 	float k_1;
     public:
+	typedef float input_t;
+	typedef float output_t;
+
 	inline float process( float s ) {
 	    float tmp = k_1;
 	    k_1 = this->t1.process( s + k_1 );
@@ -130,7 +136,7 @@ class Feedback : public Container1<T1>
 	}
 };
 
-class Smooth : public Block
+class Smooth : public FBlock
 {
     private:
 	float acc;
@@ -145,7 +151,7 @@ class Smooth : public Block
 	}
 };
 
-class Clamp : public Block
+class Clamp : public FBlock
 {
     public:
 	inline float process( float s ) {

@@ -13,6 +13,9 @@ class Container2 : public Block
     protected:
 	T1 t1;
 	T2 t2;
+
+	typedef T1 T1_t;
+	typedef T2 T2_t;
     public:
 	inline void reset() {
 	    t1.reset();
@@ -37,6 +40,8 @@ class Container1 : public Block
 {
     protected:
 	T1 t1;
+
+	typedef T1 T1_t;
     public:
 	inline void reset() {
 	    t1.reset();
@@ -62,6 +67,9 @@ class ChainedContainer<Base, T1, Args...> : public Block
     protected:
 	T1 t1;
 	Base<Args...> t2;
+
+	typedef T1 T1_t;
+	typedef Base<Args...> T2_t;
     public:
 	inline void reset() {
 	    t1.reset();
@@ -86,6 +94,9 @@ class ChainedContainer<Base, T1, T2> : public Block
     protected:
 	T1 t1;
 	T2 t2;
+
+	typedef T1 T1_t;
+	typedef T2 T2_t;
     public:
 	inline void reset() {
 	    t1.reset();
@@ -117,6 +128,9 @@ template<typename ... Args>
 class Parallel : public ChainedContainer<Parallel, Args...>
 {
     public:
+	typedef float output_t;
+	typedef float input_t;
+
 	inline float process( float s ) {
 	    return this->t1.process( s ) + this->t2.process( s );
 	}
@@ -171,11 +185,10 @@ template<typename ... Args>
 class Chain : public ChainedContainer<Chain, Args...>
 {
     public:
-	inline float process( float s ) {
-	    return this->t2.process( this->t1.process( s ) );
-	}
-	template<int N>
-	inline fvec<N> process( fvec<N> s ) {
+	typedef typename ChainedContainer<Chain, Args...>::T2_t::output_t output_t;
+	typedef typename ChainedContainer<Chain, Args...>::T1_t::input_t  input_t;
+
+	inline output_t process( input_t s ) {
 	    return this->t2.process( this->t1.process( s ) );
 	}
 };
@@ -184,7 +197,10 @@ template<typename T1>
 class Chain<T1> : public Container1<T1>
 {
     public:
-	inline float process( float s ) {
+	typedef typename Container1<T1>::T1_t::output_t output_t;
+	typedef typename Container1<T1>::T1_t::input_t  input_t;
+
+	inline output_t process( input_t s ) {
 	    return this->t1.process( s );
 	}
 };
@@ -197,7 +213,10 @@ template<typename IN, typename ... Args>
 class Sequence<IN, Args ...> : public Container2<IN, Chain<Args...> >
 {
     public:
-	inline float process() {
+	typedef typename Container2<IN, Chain<Args...> >::T2_t::output_t output_t;
+	typedef nil_input_t  input_t;
+
+	inline output_t process() {
 	    return this->t2.process( this->t1.process() );
 	}
 
