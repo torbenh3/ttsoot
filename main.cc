@@ -28,7 +28,7 @@ int process( jack_nframes_t nframes, void *arg )
 
 #define DUMP_SIZE 1024*20
 #define BENCH_SIZE 1024
-#define BENCH_ITER 1024*50*20
+#define BENCH_ITER 1024*50
 void dump( dsp &engine)
 {
     float buf[DUMP_SIZE];
