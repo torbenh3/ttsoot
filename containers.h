@@ -5,6 +5,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "block.h"
+#include "fvec.h"
 
 template<typename T1, typename T2>
 class Container2 : public Block
@@ -121,12 +122,60 @@ class Parallel : public ChainedContainer<Parallel, Args...>
 	}
 };
 
+template<typename ... Args>
+class Vector : public ChainedContainer<Vector, Args...>
+{
+    public:
+	inline fvec<sizeof...(Args)> process( float s ) {
+	    return fvec<sizeof...(Args)>( this->t1.process( s ),  this->t2.process( s ) );
+	}
+};
+
+template<typename T1, typename T2>
+class Vector<T1,T2> : public Container2<T1,T2>
+{
+    public:
+	inline fvec<2> process( float s ) {
+	    return fvec<2>( this->t2.process(s), fvec<1>( this->t1.process( s ) ) );
+	}
+};
+
+template<typename T1>
+class Vector<T1> : public Container1<T1>
+{
+    public:
+	inline fvec<1> process( float s ) {
+	    return fvec<1>( this->t1.process( s ) );
+	}
+};
+
+template<typename ... Args>
+class VectorGen : public ChainedContainer<VectorGen, Args...>
+{
+    public:
+	inline fvec<sizeof...(Args)> process() {
+	    return fvec<sizeof...(Args)>( this->t1.process(),  this->t2.process() );
+	}
+};
+
+template<typename T1>
+class VectorGen<T1> : public Container1<T1>
+{
+    public:
+	inline fvec<1> process() {
+	    return fvec<1>( this->t1.process() );
+	}
+};
 
 template<typename ... Args>
 class Chain : public ChainedContainer<Chain, Args...>
 {
     public:
 	inline float process( float s ) {
+	    return this->t2.process( this->t1.process( s ) );
+	}
+	template<int N>
+	inline fvec<N> process( fvec<N> s ) {
 	    return this->t2.process( this->t1.process( s ) );
 	}
 };
