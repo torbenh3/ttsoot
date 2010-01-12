@@ -27,6 +27,7 @@ class Parameter
 	void set( float val ) { if(setter) setter(val); else *val_ptr = val; }
 
 	float min, max, def;
+	Parameter & operator = ( float f ) { set(f); return *this; }
 };
 
 class paramMap : public std::map<std::string, Parameter>
