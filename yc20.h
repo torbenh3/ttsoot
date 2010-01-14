@@ -109,7 +109,98 @@ typedef yc20voice<27, 56,  120, 270, 560,  820, 1200> yc20voice_I3;
 
 typedef VVectorGen< yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I3, yc20voice_I3, yc20voice_I3, yc20voice_I3 > voice_vector; 
 
-typedef Sequence< voice_vector, VectorSum<8*12> > yc20_t;
+class yc20busbar : public Block
+{
+    public:
+	typedef fvec<8*12> input_t;
+	typedef fvec<7> output_t;
+
+	fvec<61> keys;
+
+	inline fvec<7> process( fvec<8*12> s )
+	{
+	    fvec<7> retval;
+	    float acc=0.0f;
+	    // XXX:
+	    for( int i=0; i<12; i++ )
+		acc += (s[i*8] * keys[i]);
+
+	    retval[0] = acc;
+	    acc = 0.0f;
+	    for( int i=0; i<12; i++ )
+		acc += (s[i*8+1] * keys[i+12]);
+	    retval[1] = acc;
+	    retval[2] = acc;
+	    retval[3] = acc;
+	    return retval;
+
+	    // XXX:
+	    for( int oct=0; oct < 4;  oct++ )
+		for( int key=0; key < 12; key++ )
+		    acc += (s[(3-oct)+key*8] * keys[key+12*oct]);
+
+	    for( int key=0; key < 12; key++ )
+		acc += (s[key*8] * keys[key+12*4]);
+
+	    retval[0] = acc;
+
+	    acc=0.0f;
+	    for( int oct=0; oct < 4;  oct++ ) {
+		for( int key=0; key < 4; key++ )
+		    acc += (s[(3-oct)+(key+7)*8] * keys[key+12*oct]);
+		for( int key=4; key < 12; key++ )
+		    acc += (s[(4-oct)+(key-4)*8] * keys[key+12*oct]);
+	    }
+
+	    retval[1] = acc;
+
+	    acc=0.0f;
+	    for( int oct=0; oct < 5;  oct++ )
+		for( int key=0; key < 12; key++ )
+		    acc += (s[(4-oct)+key*8] * keys[key+12*oct]);
+
+	    retval[2] = acc;
+
+	    acc=0.0f;
+	    for( int oct=0; oct < 5;  oct++ ) {
+		for( int key=0; key < 9; key++ )
+		    acc += s[(4-oct)+(key+3)*8] * keys[key+12*oct];
+		for( int key=9; key < 12; key++ )
+		    acc += (s[(5-oct)+(key-9)*8] * keys[key+12*oct]);
+	    }
+
+	    retval[3] = acc;
+
+	    acc=0.0f;
+	    for( int oct=0; oct < 5;  oct++ )
+		for( int key=0; key < 12; key++ )
+		    acc += (s[(5-oct)+key*8] * keys[key+12*oct]);
+
+	    retval[4] = acc;
+
+	    acc=0.0f;
+	    for( int oct=0; oct < 5;  oct++ )
+		for( int key=0; key < 12; key++ )
+		    acc += (s[(6-oct)+key*8] * keys[key+12*oct]);
+
+	    retval[5] = acc;
+
+	    acc=0.0f;
+	    for( int oct=0; oct < 5;  oct++ )
+		for( int key=0; key < 12; key++ )
+		    acc += (s[(7-oct)+key*8] * keys[key+12*oct]);
+
+	    retval[6] = acc;
+
+	    return retval;
+	}
+
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    map.add_this( "busbar", this );
+	}
+};
+
+typedef Sequence< voice_vector, yc20busbar, VGain<7>, VectorSum<7> > yc20_t;
 #endif
 
 

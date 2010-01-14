@@ -19,6 +19,7 @@
  */
 
 #include <jack/jack.h>
+#include <jack/midiport.h>
 #include <unistd.h>
 #include <string.h>
 #include <iostream>
@@ -58,7 +59,7 @@ yc20_t osc_block __attribute__((restrict));
 //block_t osc_block __attribute__((restrict));
 
 
-dsp::dsp( jack_port_t *in_port, jack_nframes_t nframes ) {
+dsp::dsp( jack_port_t *in_port, jack_port_t *midi_p, jack_nframes_t nframes ) {
     osc_block.register_params( params, "" );
     //InBuffer *inbuf = dynamic_cast<InBuffer *>( params.get_block( "/in/InBuf" ) );
     //buffer = inbuf->get_buf_ptr();
@@ -66,6 +67,12 @@ dsp::dsp( jack_port_t *in_port, jack_nframes_t nframes ) {
     JackInPort *inbuf = dynamic_cast<JackInPort *>( params.get_block( "/in/InBuf" ) );
     if( inbuf )
 	inbuf->set_port_and_nframes( in_port, nframes );
+
+    midi_port = midi_p;
+    yc20busbar *bb = dynamic_cast<yc20busbar *>( params.get_block( "busbar" ) );
+    if( bb == 0 )
+	exit(20);
+    keys = &(bb->keys);
 }
 
 void 
@@ -82,6 +89,24 @@ void
 dsp::fill_channel( float * __restrict__ buf, jack_nframes_t nframes )
 {
     int i;
+
+    void *midi_buf = jack_port_get_buffer( midi_port, nframes );
+    jack_nframes_t ev_cnt = jack_midi_get_event_count( midi_buf );
+    for(i=0; i<ev_cnt; i++ ) {
+	jack_midi_event_t ev;
+	jack_midi_event_get( &ev, midi_buf, i );
+	if( ev.size == 3 ) {
+	    if( (ev.buffer[0] == 0x90) && ev.buffer[1] < 61 ) {
+		(*keys)[ev.buffer[1]] = 1.0f;
+		printf( "on... %d\n", (int) ev.buffer[1] );
+	    }
+	    if( (ev.buffer[0] == 0x80) && ev.buffer[1] < 61 ) {
+		(*keys)[ev.buffer[1]] = 0.0f;
+		printf( "off... %d\n", (int) ev.buffer[1] );
+	    }
+	}
+    }
+    
 
     osc_block.prep();
     for( i=0; i<nframes; i++ ) {

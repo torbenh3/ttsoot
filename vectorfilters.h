@@ -21,6 +21,7 @@
 #define VECTORFILTERS_HH
 
 #include "containers.h"
+#include <boost/lexical_cast.hpp>
 
 template<int N, typename T1>
 class VectorMul : public Container1<T1>
@@ -87,6 +88,13 @@ class VGain : public Block
 	{
 	    return _gain_vec * s;
 	}
+
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    for( int i=0; i<N; i++ )
+		map.add_param( prefix + "/gain[" + boost::lexical_cast<std::string>(i) + "]", 
+			       Parameter( &(_gain_vec[i]), 0.00, 0.00, 1.0 ) );
+	}
+
 };
 
 template<int N>

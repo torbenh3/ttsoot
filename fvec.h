@@ -28,6 +28,11 @@ class fvec
     public:
 	static const int size = N;
 
+	fvec( const fvec<N> & other ) {
+	    for( int i=0; i<N; i++ )
+		_vec[i] = other._vec[i];
+	}
+
 	fvec() {
 	    for( int i=0; i<N; i++ )
 		_vec[i] = 0.0;
@@ -49,9 +54,9 @@ class fvec
 
 	template<int M>
 	fvec( fvec<M> v1, fvec<N-M> v2 ) {
-	    for( int i=0; i<M-1; i++ )
+	    for( int i=0; i<(M-1); i++ )
 		_vec[i] = v1[i];
-	    for( int i=0; i<N-M-1; i++ )
+	    for( int i=0; i<(N-M-1); i++ )
 		_vec[i+N] = v2[i];
 	}
 

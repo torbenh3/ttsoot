@@ -22,13 +22,16 @@
 
 #include <jack/jack.h>
 #include "block.h"
+#include "fvec.h"
 
 class dsp {
     private:
 	paramMap params;
 	float **buffer;
+	jack_port_t *midi_port;
+	fvec<61> * keys;
     public:
-	dsp( jack_port_t *port, jack_nframes_t nframes );
+	dsp( jack_port_t *port, jack_port_t *midi_port, jack_nframes_t nframes );
 
 	paramMap & get_params();
 	void fill_channel( float * __restrict__ buf, jack_nframes_t nframes );

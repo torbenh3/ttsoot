@@ -30,6 +30,7 @@
 
 jack_port_t *out_port;
 jack_port_t *in_port;
+jack_port_t *midi_port;
 
 
 
@@ -75,7 +76,8 @@ int main( int argc, char **argv )
     jack_client_t *client = jack_client_open( "ttsoot", JackNullOption, 0 );
     out_port = jack_port_register( client, "out", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 );
     in_port = jack_port_register( client, "in", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0 );
-    dsp engine( in_port, jack_get_buffer_size( client ) );
+    midi_port = jack_port_register( client, "midi", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0 );
+    dsp engine( in_port, midi_port, jack_get_buffer_size( client ) );
 
     if( (argc==2) && (strcmp( argv[1], "dump" )==0) ) {
 
