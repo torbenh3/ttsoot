@@ -34,7 +34,7 @@ class Param : public GenBlock
 	Param() {
 	    _param = 1.0;
 	}
-	inline float process() {
+	inline float __attribute__((always_inline)) process()   {
 	    return _param;
 	}
 
@@ -47,7 +47,7 @@ template<int val>
 class ConstInt : public GenBlock
 {
     public:
-	inline float process() {
+	inline float __attribute__((always_inline)) process()   {
 	    return (float) val;
 	}
 };
@@ -56,7 +56,7 @@ template<int num, int denom>
 class ConstFract : public GenBlock
 {
     public:
-	inline float process() {
+	inline float __attribute__((always_inline)) process()   {
 	    return (float) num / (float) denom;
 	}
 };
@@ -68,7 +68,7 @@ class Modulate : public Container1<T1>
 	typedef float input_t;
 	typedef float output_t;
 
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    return this->t1.process() * s;
 	}
 
@@ -88,7 +88,7 @@ class InBuffer : public GenBlock
 	    _buf = 0;
 	    k=0;
 	}
-	inline float process() {
+	inline float __attribute__((always_inline)) process()   {
 	    return _buf[k++];
 	}
 
@@ -127,7 +127,7 @@ class Z1 : public FBlock
 	float k_1;
     public:
 	Z1() { k_1 = 0.0; }
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    float tmp = k_1;
 	    k_1 = s;
 	    return tmp;
@@ -144,7 +144,7 @@ class Feedback : public Container1<T1>
 	typedef float input_t;
 	typedef float output_t;
 
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    float tmp = k_1;
 	    k_1 = this->t1.process( s + k_1 );
 	    return tmp;
@@ -161,7 +161,7 @@ class Smooth : public FBlock
 	float acc;
     public:
 	Smooth() { acc = 0.0; }
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    acc = 0.99f*acc + 0.01f * s;
 	    return acc;
 	}
@@ -173,7 +173,7 @@ class Smooth : public FBlock
 class Clamp : public FBlock
 {
     public:
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    return std::min( std::max( s, -1.0f ), 1.0f );
 	}
 };

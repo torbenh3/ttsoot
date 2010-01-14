@@ -22,9 +22,9 @@
 
 typedef Chain< BiQuadLP, BiQuadHP, Gain> FBank;
 
-typedef Cascade< FlipFlop, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank > FlipFlopFilterCascade;
+typedef VectorCascade< FlipFlop, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank > FlipFlopFilterCascade;
 
-template<int c6, int c5, int c4, int c3, int c2, int c1, int c0>
+template<int cc6, int cc5, int cc4, int cc3, int cc2, int cc1, int cc0>
 class YC20FilterBank : public FlipFlopFilterCascade
 {
     private:
@@ -47,13 +47,13 @@ class YC20FilterBank : public FlipFlopFilterCascade
 	    float R1 = 1.0 / ( 1.0/next_stage_resistance + 1.0/82000.0  );
 	    float R0 = 1.0 / ( 1.0/next_stage_resistance + 1.0/56000.0  );
 			
-	    float C0 = (float)c0 / 10000.0;
-	    float C1 = (float)c1 / 10000.0;
-	    float C2 = (float)c2 / 10000.0;
-	    float C3 = (float)c3 / 10000.0;
-	    float C4 = (float)c4 / 10000.0;
-	    float C5 = (float)c5 / 10000.0;
-	    float C6 = (float)c6 / 10000.0;
+	    float C0 = (float)cc0 / 10000.0;
+	    float C1 = (float)cc1 / 10000.0;
+	    float C2 = (float)cc2 / 10000.0;
+	    float C3 = (float)cc3 / 10000.0;
+	    float C4 = (float)cc4 / 10000.0;
+	    float C5 = (float)cc5 / 10000.0;
+	    float C6 = (float)cc6 / 10000.0;
 
 	    local_map["/0/0/bw"] = 3.0;
 	    local_map["/0/0/cut"] = 15000;
@@ -95,23 +95,21 @@ class YC20FilterBank : public FlipFlopFilterCascade
 	    local_map["/1/1/1/1/1/1/1/0/1/bw"] = 3.0;
 	    local_map["/1/1/1/1/1/1/1/0/1/cut"] = passive_rc_frequency( R0 + 15000, 0.039 );
 	    local_map["/1/1/1/1/1/1/1/0/2/mod/gain"] = 1.0;
-	    local_map["/1/1/1/1/1/1/1/1/0/0/bw"] = 3.0;
-	    local_map["/1/1/1/1/1/1/1/1/0/0/cut"] = passive_rc_frequency( 15000, C6 );
-	    local_map["/1/1/1/1/1/1/1/1/0/1/bw"] = 3.0;
-	    local_map["/1/1/1/1/1/1/1/1/0/1/cut"] = 1.0;
-	    local_map["/1/1/1/1/1/1/1/1/0/2/mod/gain"] = 0.0;
 	}
 	virtual void register_params( paramMap &map, std::string prefix ) { }
 
 };
 
 template<int c6, int c5, int c4, int c3, int c2, int c1, int c0>
-class yc20voice : public Sequence< SlowVarBLSaw, YC20FilterBank<c6, c5, c4, c3, c2, c1, c0>, Gain > {};
+class yc20voice : public Sequence< SlowVarBLSaw, YC20FilterBank<c6, c5, c4, c3, c2, c1, c0> > {};
 
 typedef yc20voice<47, 100, 220, 470, 820, 1200, 1500> yc20voice_I1;
 typedef yc20voice<39, 82,  180, 390, 680, 1000, 1500> yc20voice_I2;
 typedef yc20voice<27, 56,  120, 270, 560,  820, 1200> yc20voice_I3;
 
-typedef Mixer< yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I3, yc20voice_I3, yc20voice_I3, yc20voice_I3 > yc20_t; 
+typedef VVectorGen< yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I3, yc20voice_I3, yc20voice_I3, yc20voice_I3 > voice_vector; 
 
+typedef Sequence< voice_vector, VectorSum<8*12> > yc20_t;
 #endif
+
+

@@ -26,6 +26,8 @@ class fvec
     private:
 	float _vec[N] __attribute__((aligned(16)));
     public:
+	static const int size = N;
+
 	fvec() {
 	    for( int i=0; i<N; i++ )
 		_vec[i] = 0.0;
@@ -43,6 +45,14 @@ class fvec
 	    for( int i=0; i<N-1; i++ )
 		_vec[i] = v[i];
 	    _vec[N-1] = f;
+	}
+
+	template<int M>
+	fvec( fvec<M> v1, fvec<N-M> v2 ) {
+	    for( int i=0; i<M-1; i++ )
+		_vec[i] = v1[i];
+	    for( int i=0; i<N-M-1; i++ )
+		_vec[i+N] = v2[i];
 	}
 
 	float & operator[] ( unsigned int index ) { return _vec[index]; }

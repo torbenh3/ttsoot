@@ -36,7 +36,7 @@ class Delay : public Block
 	    for( int i=0; i<MaxLine; i++ )
 		_line[i] = 0.0;
 	}
-	inline float process( float s) {
+	inline float __attribute__((always_inline)) process( float s)   {
 	    int del = int(_samples);
 	    _phase += 1;
 	    _line[_phase&(MaxLine-1)] = s;

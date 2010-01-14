@@ -29,7 +29,7 @@ class VectorMul : public Container1<T1>
 	typedef fvec<N> output_t;
 	typedef fvec<N> input_t;
 
-	inline fvec<N> process( fvec<N> s )
+	inline fvec<N> __attribute__((always_inline)) process( fvec<N> s )  
 	{
 	    return s * this->t1.process();
 	}
@@ -42,7 +42,7 @@ class VectorAdd : public Container1<T1>
 	typedef fvec<N> output_t;
 	typedef fvec<N> input_t;
 
-	inline fvec<N> process( fvec<N> s )
+	inline fvec<N> __attribute__((always_inline)) process( fvec<N> s )  
 	{
 	    return s + this->t1.process();
 	}
@@ -55,7 +55,7 @@ class VectorSum : public Block
 	typedef float output_t;
 	typedef fvec<N> input_t;
 
-	inline float process( fvec<N> s )
+	inline float __attribute__((always_inline)) process( fvec<N> s )  
 	{
 	    return s.sum();
 	}
@@ -68,7 +68,7 @@ class VectorSplit : public Block
 	typedef fvec<N> output_t;
 	typedef float input_t;
 
-	inline fvec<N> process( float s )
+	inline fvec<N> __attribute__((always_inline)) process( float s )  
 	{
 	    return fvec<N>( s );
 	}
@@ -83,7 +83,7 @@ class VGain : public Block
 	typedef fvec<N> output_t;
 	typedef fvec<N> input_t;
 
-	inline fvec<N> process( fvec<N> s )
+	inline fvec<N> __attribute__((always_inline)) process( fvec<N> s )  
 	{
 	    return _gain_vec * s;
 	}
@@ -96,7 +96,7 @@ class VClamp : public Block
 	typedef fvec<N> output_t;
 	typedef fvec<N> input_t;
 
-	inline fvec<N> process( fvec<N> s )
+	inline fvec<N> __attribute__((always_inline)) process( fvec<N> s )  
 	{
 	    return s.clamp();
 	}

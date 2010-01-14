@@ -141,7 +141,7 @@ class Mixer : public ChainedContainer<Mixer, Args...>
 	typedef float output_t;
 	typedef float input_t;
 
-	inline float process() {
+	inline float __attribute__((always_inline)) process()  {
 	    return this->t1.process() + this->t2.process();
 	}
 };
@@ -153,7 +153,7 @@ class Parallel : public ChainedContainer<Parallel, Args...>
 	typedef float output_t;
 	typedef float input_t;
 
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )  {
 	    return this->t1.process( s ) + this->t2.process( s );
 	}
 };
@@ -165,7 +165,7 @@ class Vector : public ChainedContainer<Vector, Args...>
 	typedef fvec<sizeof...(Args)> output_t;
 	typedef float input_t;
 
-	inline fvec<sizeof...(Args)> process( float s ) {
+	inline fvec<sizeof...(Args)> __attribute__((always_inline)) process( float s )   {
 	    return fvec<sizeof...(Args)>( this->t1.process( s ),  this->t2.process( s ) );
 	}
 };
@@ -177,7 +177,7 @@ class Vector<T1,T2> : public Container2<T1,T2>
 	typedef fvec<2> output_t;
 	typedef float input_t;
 
-	inline fvec<2> process( float s ) {
+	inline fvec<2> __attribute__((always_inline)) process( float s )   {
 	    return fvec<2>( this->t2.process(s), fvec<1>( this->t1.process( s ) ) );
 	}
 };
@@ -189,7 +189,7 @@ class Vector<T1> : public Container1<T1>
 	typedef fvec<1> output_t;
 	typedef float input_t;
 
-	inline fvec<1> process( float s ) {
+	inline fvec<1> __attribute__((always_inline)) process( float s )   {
 	    return fvec<1>( this->t1.process( s ) );
 	}
 };
@@ -201,7 +201,7 @@ class VectorGen : public ChainedContainer<VectorGen, Args...>
 	typedef fvec<sizeof...(Args)> output_t;
 	typedef nil_input_t input_t;
 
-	inline fvec<sizeof...(Args)> process() {
+	inline fvec<sizeof...(Args)> __attribute__((always_inline)) process()   {
 	    return fvec<sizeof...(Args)>( this->t1.process(),  this->t2.process() );
 	}
 };
@@ -213,8 +213,34 @@ class VectorGen<T1> : public Container1<T1>
 	typedef fvec<1> output_t;
 	typedef nil_input_t input_t;
 
-	inline fvec<1> process() {
+	inline fvec<1> __attribute__((always_inline)) process()   {
 	    return fvec<1>( this->t1.process() );
+	}
+};
+
+template<typename ... Args>
+class VVectorGen : public ChainedContainer<VVectorGen, Args...>
+{
+    public:
+	static const int out_size = ChainedContainer<VVectorGen, Args...>::T1_t::output_t::size 
+				  + ChainedContainer<VVectorGen, Args...>::T2_t::output_t::size;
+	typedef fvec<out_size> output_t;
+	typedef nil_input_t input_t;
+
+	inline fvec<out_size> __attribute__((always_inline)) process()   {
+	    return fvec<out_size>( this->t1.process(),  this->t2.process() );
+	}
+};
+
+template<typename T1>
+class VVectorGen<T1> : public Container1<T1>
+{
+    public:
+	typedef typename T1::output_t output_t;
+	typedef nil_input_t input_t;
+
+	inline output_t __attribute__((always_inline)) process()   {
+	    return this->t1.process();
 	}
 };
 
@@ -225,7 +251,7 @@ class Chain : public ChainedContainer<Chain, Args...>
 	typedef typename ChainedContainer<Chain, Args...>::T2_t::output_t output_t;
 	typedef typename ChainedContainer<Chain, Args...>::T1_t::input_t  input_t;
 
-	inline output_t process( input_t s ) {
+	inline output_t __attribute__((always_inline)) process( input_t s )   {
 	    return this->t2.process( this->t1.process( s ) );
 	}
 };
@@ -237,7 +263,7 @@ class Chain<T1> : public Container1<T1>
 	typedef typename Container1<T1>::T1_t::output_t output_t;
 	typedef typename Container1<T1>::T1_t::input_t  input_t;
 
-	inline output_t process( input_t s ) {
+	inline output_t __attribute__((always_inline)) process( input_t s )   {
 	    return this->t1.process( s );
 	}
 };
@@ -253,7 +279,7 @@ class Sequence<IN, Args ...> : public Container2<IN, Chain<Args...> >
 	typedef typename Container2<IN, Chain<Args...> >::T2_t::output_t output_t;
 	typedef nil_input_t  input_t;
 
-	inline output_t process() {
+	inline output_t __attribute__((always_inline)) process()   {
 	    return this->t2.process( this->t1.process() );
 	}
 
@@ -275,7 +301,7 @@ class Cascade<C, T1, Args...> : public Container2<T1, Cascade<C, Args...> >
 	typedef float output_t;
 	typedef float input_t;
 
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    return this->t1.process( s ) + this->t2.process( this->c1.process( s ) );
 	}
 };
@@ -287,7 +313,7 @@ class Cascade<C1,T1> : public Container1<T1>
 	typedef float output_t;
 	typedef float input_t;
 
-	inline float process( float s ) {
+	inline float __attribute__((always_inline)) process( float s )   {
 	    return this->t1.process( s );
 	}
 };
@@ -301,11 +327,11 @@ class VectorCascade<C, T1, Args...> : public Container2<T1, VectorCascade<C, Arg
     protected:
 	C c1;
     public:
-	typedef fvec<sizeof...(Args)> output_t;
+	typedef fvec<sizeof...(Args)+1> output_t;
 	typedef float input_t;
 
-	inline fvec<sizeof...(Args)> process( float s ) {
-	    return fvec<sizeof...(Args)> (this->t1.process( s ), this->t2.process( this->c1.process( s ) ) );
+	inline fvec<sizeof...(Args)+1> __attribute__((always_inline)) process( float s )   {
+	    return fvec<sizeof...(Args)+1> (this->t1.process( s ), this->t2.process( this->c1.process( s ) ) );
 	}
 };
 
@@ -316,7 +342,7 @@ class VectorCascade<C1,T1> : public Container1<T1>
 	typedef fvec<1> output_t;
 	typedef float input_t;
 
-	inline fvec<1> process( float s ) {
+	inline fvec<1> __attribute__((always_inline)) process( float s )   {
 	    return fvec<1> (this->t1.process( s ) );
 	}
 };

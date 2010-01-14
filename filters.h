@@ -25,7 +25,7 @@
 #include "containers.h"
 #include <cmath>
 
-class BiQuadForm1 : public Block
+class BiQuadForm1 : public FBlock
 {
     protected:
 	float b0, b1, b2;
@@ -40,7 +40,7 @@ class BiQuadForm1 : public Block
 	    x_1=0; x_2=0; y_1=0; y_2=0;
        	}
 
-	float process( float s )
+	float __attribute__((always_inline)) process( float s )
 	{
 	    float tmp = (b0 * s) + (b1 * x_1) + (b2 * x_1) + (a1 * y_1) + (a2 * y_2);
 	    x_2 = x_1;
@@ -85,7 +85,7 @@ class FlipFlop : public Block
 	float y_1;
     public:
 	FlipFlop() { x_1=0; y_1 = 1.0; }
-	float process( float s )
+	float __attribute__((always_inline)) process( float s )
 	{
 	    if( (x_1 < 0.5) && (s > 0.5) )
 		y_1 = -1.0*y_1; 
