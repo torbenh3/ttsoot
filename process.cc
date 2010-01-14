@@ -31,15 +31,15 @@
 #include "vectorfilters.h"
 //#include "fvec4.h"
 
-//#include "yc20.h"
-//yc20_t osc_block __attribute__((restrict));
+#include "yc20.h"
+yc20_t osc_block __attribute__((restrict));
 
 //Sequence< BLSawOsc, Gain > osc_block;
 //typedef Sequence< QuadSinOsc, Gain > block_t;
 //typedef Sequence<JackInPort, Feedback<Chain<Z1, Z1, Z1, Z1>>, Gain> block_t;
 //typedef Sequence<JackInPort,Parallel<Feedback<Chain<Delay<1024>, Gain>>, Gain>> block_t;
 
-typedef Chain< BiQuadHP, BiQuadLP, Gain> FBank;
+//typedef Chain< BiQuadHP, BiQuadLP, Gain> FBank;
 
 //typedef Sequence< SlowVarBLSaw, 
 //	          Cascade< FlipFlop, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank >, 
@@ -53,9 +53,9 @@ typedef Chain< BiQuadHP, BiQuadLP, Gain> FBank;
 
 //typedef Mixer< yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice > block_t; 
 
-typedef Sequence< SinOsc, VectorSplit<4>, VGain<4>, VClamp<4>, VGain<4>, VClamp<4>, VGain<4>, VectorSum<4> > block_t;
+//typedef Sequence< SinOsc, VectorSplit<4>, VGain<4>, VClamp<4>, VGain<4>, VClamp<4>, VGain<4>, VectorSum<4> > block_t;
 
-block_t osc_block __attribute__((restrict));
+//block_t osc_block __attribute__((restrict));
 
 
 dsp::dsp( jack_port_t *in_port, jack_nframes_t nframes ) {
