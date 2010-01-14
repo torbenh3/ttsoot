@@ -29,6 +29,7 @@
 #include "filters.h"
 #include "oscilators.h"
 #include "vectorfilters.h"
+//#include "fvec4.h"
 
 //#include "yc20.h"
 //yc20_t osc_block __attribute__((restrict));
@@ -52,7 +53,7 @@ typedef Chain< BiQuadHP, BiQuadLP, Gain> FBank;
 
 //typedef Mixer< yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice, yc20voice > block_t; 
 
-typedef Sequence< SinOsc, VectorSplit<4>, VGain<4>, VClamp<4>, VectorSum<4> > block_t;
+typedef Sequence< SinOsc, VectorSplit<4>, VGain<4>, VClamp<4>, VGain<4>, VClamp<4>, VGain<4>, VectorSum<4> > block_t;
 
 block_t osc_block __attribute__((restrict));
 
