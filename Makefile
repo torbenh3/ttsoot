@@ -1,6 +1,6 @@
 
 
-CXXFLAGS=-O3 -ffast-math -fgcse-sm -march=core2 -funsafe-math-optimizations `pkg-config --cflags jack gtkmm-2.4` -std=gnu++0x
+CXXFLAGS=-O3 -ffast-math -fgcse-sm -march=core2 -funsafe-math-optimizations `pkg-config --cflags jack gtkmm-2.4` -std=gnu++0x -msse3
 LDFLAGS=`pkg-config --libs jack gtkmm-2.4`
 CXX=/opt/gcc/bin/g++
 
