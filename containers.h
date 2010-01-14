@@ -138,6 +138,9 @@ template<typename ... Args>
 class Mixer : public ChainedContainer<Mixer, Args...>
 {
     public:
+	typedef float output_t;
+	typedef float input_t;
+
 	inline float process() {
 	    return this->t1.process() + this->t2.process();
 	}
@@ -159,6 +162,9 @@ template<typename ... Args>
 class Vector : public ChainedContainer<Vector, Args...>
 {
     public:
+	typedef fvec<sizeof...(Args)> output_t;
+	typedef float input_t;
+
 	inline fvec<sizeof...(Args)> process( float s ) {
 	    return fvec<sizeof...(Args)>( this->t1.process( s ),  this->t2.process( s ) );
 	}
@@ -168,6 +174,9 @@ template<typename T1, typename T2>
 class Vector<T1,T2> : public Container2<T1,T2>
 {
     public:
+	typedef fvec<2> output_t;
+	typedef float input_t;
+
 	inline fvec<2> process( float s ) {
 	    return fvec<2>( this->t2.process(s), fvec<1>( this->t1.process( s ) ) );
 	}
@@ -177,6 +186,9 @@ template<typename T1>
 class Vector<T1> : public Container1<T1>
 {
     public:
+	typedef fvec<1> output_t;
+	typedef float input_t;
+
 	inline fvec<1> process( float s ) {
 	    return fvec<1>( this->t1.process( s ) );
 	}
@@ -186,6 +198,9 @@ template<typename ... Args>
 class VectorGen : public ChainedContainer<VectorGen, Args...>
 {
     public:
+	typedef fvec<sizeof...(Args)> output_t;
+	typedef nil_input_t input_t;
+
 	inline fvec<sizeof...(Args)> process() {
 	    return fvec<sizeof...(Args)>( this->t1.process(),  this->t2.process() );
 	}
@@ -195,6 +210,9 @@ template<typename T1>
 class VectorGen<T1> : public Container1<T1>
 {
     public:
+	typedef fvec<1> output_t;
+	typedef nil_input_t input_t;
+
 	inline fvec<1> process() {
 	    return fvec<1>( this->t1.process() );
 	}
@@ -254,6 +272,9 @@ class Cascade<C, T1, Args...> : public Container2<T1, Cascade<C, Args...> >
     protected:
 	C c1;
     public:
+	typedef float output_t;
+	typedef float input_t;
+
 	inline float process( float s ) {
 	    return this->t1.process( s ) + this->t2.process( this->c1.process( s ) );
 	}
@@ -263,8 +284,40 @@ template<typename C1, typename T1>
 class Cascade<C1,T1> : public Container1<T1>
 {
     public:
+	typedef float output_t;
+	typedef float input_t;
+
 	inline float process( float s ) {
 	    return this->t1.process( s );
+	}
+};
+
+template<typename ... Args>
+class VectorCascade;
+
+template<typename C, typename T1, typename ... Args>
+class VectorCascade<C, T1, Args...> : public Container2<T1, VectorCascade<C, Args...> >
+{
+    protected:
+	C c1;
+    public:
+	typedef fvec<sizeof...(Args)> output_t;
+	typedef float input_t;
+
+	inline fvec<sizeof...(Args)> process( float s ) {
+	    return fvec<sizeof...(Args)> (this->t1.process( s ), this->t2.process( this->c1.process( s ) ) );
+	}
+};
+
+template<typename C1, typename T1>
+class VectorCascade<C1,T1> : public Container1<T1>
+{
+    public:
+	typedef fvec<1> output_t;
+	typedef float input_t;
+
+	inline fvec<1> process( float s ) {
+	    return fvec<1> (this->t1.process( s ) );
 	}
 };
 #endif
