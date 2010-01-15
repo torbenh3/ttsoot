@@ -20,17 +20,6 @@
 
 #include <jack/jack.h>
 #include <jack/midiport.h>
-#include <unistd.h>
-#include <string.h>
-#include <iostream>
-#include "ttsoot/block.h" 
-
-#include "time.h" 
-
-//#include "ttsoot/process.h"
-#include "ttsoot/filters.h"
-#include "ttsoot/oscilators.h"
-#include "ttsoot/vectorfilters.h"
 
 #include "jack-gtkmm/engine.h"
 

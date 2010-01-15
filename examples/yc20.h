@@ -22,6 +22,11 @@
 
 #include <cmath>
 
+#include "ttsoot/block.h" 
+#include "ttsoot/filters.h"
+#include "ttsoot/oscilators.h"
+#include "ttsoot/vectorfilters.h"
+
 typedef Chain< BiQuadLP, BiQuadHP, Gain> FBank;
 
 typedef VectorCascade< FlipFlop, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank > FlipFlopFilterCascade;
