@@ -20,6 +20,8 @@
 #ifndef YC20_HH
 #define YC20_HH
 
+#include <cmath>
+
 typedef Chain< BiQuadLP, BiQuadHP, Gain> FBank;
 
 typedef VectorCascade< FlipFlop, FBank, FBank, FBank, FBank, FBank, FBank, FBank, FBank > FlipFlopFilterCascade;
@@ -37,7 +39,6 @@ class YC20FilterBank : public FlipFlopFilterCascade
     public:
 	YC20FilterBank() {
 	    FlipFlopFilterCascade::register_params( local_map, "" );
-	    local_map.dump();
 
 	    // TODO: This is still a guess. It could probably be looked up on the schematics
 	    float next_stage_resistance = 180000.0 + 1.0/( 1.0/10000.0 + 1.0/100000.0 );
@@ -101,13 +102,43 @@ class YC20FilterBank : public FlipFlopFilterCascade
 };
 
 template<int c6, int c5, int c4, int c3, int c2, int c1, int c0>
-class yc20voice : public Sequence< SlowVarBLSaw, YC20FilterBank<c6, c5, c4, c3, c2, c1, c0> > {};
+class yc20voice : public Sequence< CrushedSin, YC20FilterBank<c6, c5, c4, c3, c2, c1, c0> > {};
 
 typedef yc20voice<47, 100, 220, 470, 820, 1200, 1500> yc20voice_I1;
 typedef yc20voice<39, 82,  180, 390, 680, 1000, 1500> yc20voice_I2;
 typedef yc20voice<27, 56,  120, 270, 560,  820, 1200> yc20voice_I3;
 
-typedef VVectorGen< yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I3, yc20voice_I3, yc20voice_I3, yc20voice_I3 > voice_vector; 
+typedef VVectorGen< yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I1, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I2, yc20voice_I3, yc20voice_I3, yc20voice_I3, yc20voice_I3 > voice_vector_base;
+
+class voice_vector : public voice_vector_base
+{
+    private:
+	paramMap pmap;
+	float note2freq( int i )
+       	{
+	    return 440.0f*9.0f * std::pow( 2.0f, (float)(i+1)/12.0f );
+	}
+    public:
+	voice_vector()
+	{
+	    voice_vector_base::register_params( pmap, "" );
+	    //pmap.dump();
+	    pmap["/0/in/in/freq"] = note2freq( 0 );
+	    pmap["/1/in/in/freq"] = note2freq( 1 ); 
+	    pmap["/2/in/in/freq"] = note2freq( 2 ); 
+	    pmap["/3/in/in/freq"] = note2freq( 3 ); 
+	    pmap["/4/in/in/freq"] = note2freq( 4 ); 
+	    pmap["/5/in/in/freq"] = note2freq( 5 ); 
+	    pmap["/6/in/in/freq"] = note2freq( 6 ); 
+	    pmap["/7/in/in/freq"] = note2freq( 7 ); 
+	    pmap["/8/in/in/freq"] = note2freq( 8 ); 
+	    pmap["/9/in/in/freq"] = note2freq( 9 ); 
+	    pmap["/10/in/in/freq"] = note2freq( 10 ); 
+	    pmap["/11/in/in/freq"] = note2freq( 11 ); 
+	}
+
+	virtual void register_params( paramMap &map, std::string prefix ) { }
+};
 
 class yc20busbar : public Block
 {
@@ -117,24 +148,10 @@ class yc20busbar : public Block
 
 	fvec<61> keys;
 
-	inline fvec<7> process( fvec<8*12> s )
+	inline fvec<7> __attribute__((always_inline)) process( fvec<8*12> s )
 	{
 	    fvec<7> retval;
 	    float acc=0.0f;
-	    // XXX:
-	    for( int i=0; i<12; i++ )
-		acc += (s[i*8] * keys[i]);
-
-	    retval[0] = acc;
-	    acc = 0.0f;
-	    for( int i=0; i<12; i++ )
-		acc += (s[i*8+1] * keys[i+12]);
-	    retval[1] = acc;
-	    retval[2] = acc;
-	    retval[3] = acc;
-	    return retval;
-
-	    // XXX:
 	    for( int oct=0; oct < 4;  oct++ )
 		for( int key=0; key < 12; key++ )
 		    acc += (s[(3-oct)+key*8] * keys[key+12*oct]);
@@ -200,7 +217,8 @@ class yc20busbar : public Block
 	}
 };
 
-typedef Sequence< voice_vector, yc20busbar, VGain<7>, VectorSum<7> > yc20_t;
+typedef Sequence< voice_vector, yc20busbar, VGain<7>, VectorSum<7>, Gain > yc20_t;
+//typedef Sequence< voice_vector, VectorSum<12*8> > yc20_t;
 #endif
 
 
