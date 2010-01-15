@@ -33,7 +33,7 @@
 //#include "fvec4.h"
 
 #include "yc20.h"
-yc20_t osc_block __attribute__((restrict));
+yc20_t osc_block; // __attribute__((restrict));
 
 //Sequence< BLSawOsc, Gain > osc_block;
 //typedef Sequence< QuadSinOsc, Gain > block_t;
