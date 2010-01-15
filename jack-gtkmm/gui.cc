@@ -26,8 +26,11 @@ mainWin::mainWin( paramMap & params )
     : _params( params )
 {
     for( auto i=params.begin(); i!=params.end(); i++ ) {
-	Gtk::Adjustment *adj = Gtk::manage( new ParamAdjustment( i->second ) );
+	Parameter &param = i->second;
+	Gtk::Adjustment *adj = Gtk::manage( new ParamAdjustment( param ) );
 	std::shared_ptr<Gtk::VScale> scal( new Gtk::VScale (*adj) );
+
+	scal->set_digits( 3 ); 
         _hbox.pack_start( *scal );
 	scale_list.push_back( scal );
 	scal->set_tooltip_text( i->first );
