@@ -1,0 +1,11 @@
+
+ttsoot is a template library for DSP code. It allows to write sample based processing functions, 
+but retains the flexibility of graph based processing.
+
+The container types are based on c++0x variadic templates. 
+they are using template template arguments, which are a gcc-4.5 feature. 
+
+so... in order to compile this, you need a gcc trunk :)
+
+the yc20 example is based on sampos faust implementation.
+
