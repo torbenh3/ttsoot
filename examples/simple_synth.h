@@ -37,6 +37,8 @@ class my_engine : public Engine
 	paramMap params;
 	float **buffer;
 	jack_port_t *midi_port;
+	int num_pressed_keys;
+	static float note2freq( int note );
     public:
 	my_engine( jack_port_t *port, jack_port_t *midi_port, jack_nframes_t nframes );
 

@@ -31,9 +31,13 @@ my_engine::my_engine( jack_port_t *in_port, jack_port_t *midi_p, jack_nframes_t 
 {
     osc_block.register_params( params, "" );
 
+    midi_port = midi_p;
+
     JackInPort *inbuf = dynamic_cast<JackInPort *>( params.get_block( "/in/InBuf" ) );
     if( inbuf )
 	inbuf->set_port_and_nframes( in_port, nframes );
+
+    num_pressed_keys = 0;
 }
 
 void 
@@ -46,10 +50,37 @@ my_engine::get_params() {
     return params;
 }
 
+float
+my_engine::note2freq( int note )
+{
+    return 440.0f * std::pow( 2.0f, (float)(note-69)/12.0f );
+}
+
 void 
 my_engine::fill_channel( float * __restrict__ buf, jack_nframes_t nframes )
 {
     int i;
+
+    void *midi_buf = jack_port_get_buffer( midi_port, nframes );
+    jack_nframes_t ev_cnt = jack_midi_get_event_count( midi_buf );
+    for(i=0; i<ev_cnt; i++ ) {
+	jack_midi_event_t ev;
+	jack_midi_event_get( &ev, midi_buf, i );
+	if( ev.size == 3 ) {
+	    if (ev.buffer[0] == 0x90) {
+		num_pressed_keys += 1;
+		params["/chain/0/mod/hold"] = 1.0;
+		params["/chain/0/mod/trig"] = 1.0;
+		params["/in/in/freq"] = note2freq( ev.buffer[1] );
+		params["/chain/1/mod/in/gain"] = (float) ev.buffer[2] / 127.0;
+	    }
+	    if (ev.buffer[0] == 0x80) {
+		num_pressed_keys -= 1;
+		if( num_pressed_keys == 0 )
+		    params["/chain/0/mod/hold"] = 0.0;
+	    }
+	}
+    }
 
     osc_block.prep();
     for( i=0; i<nframes; i++ ) {
