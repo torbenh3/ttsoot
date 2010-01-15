@@ -16,3 +16,11 @@ def build(bld):
 		includes = "../",
 		uselib_local = "libttsoot jackgtkmm",
 		uselib = "GTKMM-2.4 JACK" )
+
+	bld.new_task_gen(
+		features = 'cxx cprogram',
+		source = 'simple_synth.cc',
+		target = 'simple_synth',
+		includes = "../",
+		uselib_local = "libttsoot jackgtkmm",
+		uselib = "GTKMM-2.4 JACK" )
