@@ -20,10 +20,11 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include "block.h"
+#include "ttsoot/block.h"
+#include "ttsoot/containers.h"
 
 template<int MaxLine>
-class Delay : public Block
+class Delay : public FBlock
 {
     private:
 	float _samples;
@@ -45,9 +46,31 @@ class Delay : public Block
 	inline void reset() { }
 
 	virtual void register_params( paramMap &map, std::string prefix ) {
-	    map.add_param( prefix + "/delay", Parameter( &_samples, 10.0, 1.0, 1023.0 ) );
+	    map.add_param( prefix + "/delay", Parameter( &_samples, 10.0, 1.0, (float) MaxLine-1 ) );
 	}
 };
 
+template<int MaxLine, typename T1>
+class VarDelay : public Container1<T1>
+{
+    private:
+	int _phase;
+	float _line[MaxLine];
+    public:
+	typedef float input_t;
+	typedef float output_t;
+
+	VarDelay() {
+	    _phase = 0;
+	    for( int i=0; i<MaxLine; i++ )
+		_line[i] = 0.0;
+	}
+	inline float __attribute__((always_inline)) process( float s)   {
+	    int del = int(this->t1.process());
+	    _phase += 1;
+	    _line[_phase&(MaxLine-1)] = s;
+	    return _line[(_phase - del)&(MaxLine-1)];
+	}
+};
 
 #endif
