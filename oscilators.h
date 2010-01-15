@@ -197,4 +197,6 @@ typedef Parallel< Chain < Modulate<ConstInt<1>> ,Sin, Modulate <ConstFract<1,1>>
 
 class SlowVarBLSaw : public Sequence<OmegaParm, PhaseGen, SlowBLVarSawBase> {};
 
+class CrushedSin : public Sequence<OmegaParm, PhaseGen, Sin, Modulate<ConstInt<2>>, Clamp> {};
+
 #endif
