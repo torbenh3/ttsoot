@@ -183,5 +183,74 @@ class Gain : public Modulate< Param<gain_name> > {};
 
 class SmoothGain : public Modulate< Sequence<Param<gain_name>,Smooth> > {};
 
+class ADSR : public GenBlock
+{
+    private:
+	float _trigger;
+	float _held;
+
+	float _att;
+	float _dec;
+	float _sus;
+	float _rel;
+
+	float _val;
+	unsigned int _phase;
+    public:
+	ADSR() {
+	    _trigger = 0.0;
+	    _held    = 0.0;
+	    _att     = 0.001;
+	    _dec     = 0.001;
+	    _sus     = 0.5;
+	    _rel     = 0.9;
+	    _val     = 0.0;
+	    _phase   = 0;
+	}
+
+	inline float __attribute__((always_inline)) process()
+	{
+	    if( _trigger != 0.0f ) {
+		_phase = 1;
+		_trigger = 0.0;
+	    }
+
+	    switch( _phase ) {
+		case 0:
+		    return _val;
+		case 1:
+		    _val += _att;
+		    if( _val >= 1.0f )
+			_phase = 2;
+		    return _val;
+		case 2:
+		    _val -= _dec;
+		    if( _val <= _sus )
+			_phase = 3;
+		    return _val;
+		case 3:
+		    if( _held == 0.0f )
+			_phase = 4;
+		    return _val;
+		case 4:
+		    _val *= _rel;
+		    if( _val <= 0.0001f ) {
+			_phase = 0;
+			_val = 0.0f;
+		    }
+		    return _val;
+		default:
+		    return _val;
+	    }
+	}
+	virtual void register_params( paramMap &map, std::string prefix ) {
+	    map.add_param( prefix + "/att", Parameter( &_att, 0.001, 0.0001, 0.1 ) );
+	    map.add_param( prefix + "/dec", Parameter( &_dec, 0.001, 0.0001, 0.1 ) );
+	    map.add_param( prefix + "/sus", Parameter( &_sus, 0.5, 0.0, 1.0 ) );
+	    map.add_param( prefix + "/rel", Parameter( &_rel, 0.9, 0.0001, 0.9999 ) );
+	    map.add_param( prefix + "/hold", Parameter( &_held, 0.0, 0.0, 1.0 ) );
+	    map.add_param( prefix + "/trig", Parameter( &_trigger, 0.001, 0.0001, 1.0 ) );
+	}
+};
 
 #endif
