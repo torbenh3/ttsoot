@@ -17,19 +17,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef GUI_ADJUSTMENT_H
-#define GUI_ADJUSTMENT_H
+#ifndef ENGINE_HH
+#define ENGINE_HH
 
-#include <gtkmm.h>
-#include "parammap.h"
+#include <jack/jack.h>
+#include "ttsoot/block.h"
 
-class ParamAdjustment : public Gtk::Adjustment
-{
-    private:
-	Parameter &param;
+class Engine {
     public:
-	ParamAdjustment( Parameter & p );
-	void change_param();
+	virtual paramMap & get_params() = 0;
+	virtual void fill_channel( float * __restrict__ buf, jack_nframes_t nframes ) = 0;
+	virtual void dump_params() = 0;
 };
+
+extern Engine * get_engine( jack_port_t *port, jack_port_t *midi_port, jack_nframes_t nframes );
 
 #endif

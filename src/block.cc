@@ -18,6 +18,6 @@
  *
  */
 
-#include "basicblocks.h"
+#include "ttsoot/block.h"
 
-char gain_name[] = "gain";
+float Block::fs = 48000.0;

@@ -219,6 +219,23 @@ class yc20busbar : public Block
 
 typedef Sequence< voice_vector, yc20busbar, VGain<7>, VectorSum<7>, Gain > yc20_t;
 //typedef Sequence< voice_vector, VectorSum<12*8> > yc20_t;
+
+
+class yc20_engine : public Engine
+{
+    private:
+	paramMap params;
+	float **buffer;
+	jack_port_t *midi_port;
+	fvec<61> * keys;
+    public:
+	yc20_engine( jack_port_t *port, jack_port_t *midi_port, jack_nframes_t nframes );
+
+	virtual paramMap & get_params();
+	virtual void fill_channel( float * __restrict__ buf, jack_nframes_t nframes );
+	virtual void dump_params();
+};
+
 #endif
 
 

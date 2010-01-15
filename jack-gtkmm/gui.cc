@@ -17,25 +17,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef PROCESS_HH
-#define PROCESS_HH
 
-#include <jack/jack.h>
-#include "ttsoot/block.h"
-#include "ttsoot/fvec.h"
+#include "gui.h"
+#include <boost/bind.hpp>
+#include "gui_adjustment.h"
 
-class dsp {
-    private:
-	paramMap params;
-	float **buffer;
-	jack_port_t *midi_port;
-	fvec<61> * keys;
-    public:
-	dsp( jack_port_t *port, jack_port_t *midi_port, jack_nframes_t nframes );
+mainWin::mainWin( paramMap & params )
+    : _params( params )
+{
+    for( auto i=params.begin(); i!=params.end(); i++ ) {
+	Gtk::Adjustment *adj = Gtk::manage( new ParamAdjustment( i->second ) );
+	std::shared_ptr<Gtk::VScale> scal( new Gtk::VScale (*adj) );
+        _hbox.pack_start( *scal );
+	scale_list.push_back( scal );
+	scal->set_tooltip_text( i->first );
+	scal->show();
+    }
+    add( _hbox );
+    _hbox.show();
+    show();
+}
 
-	paramMap & get_params();
-	void fill_channel( float * __restrict__ buf, jack_nframes_t nframes );
-	void dump_params();
-};
-
-#endif

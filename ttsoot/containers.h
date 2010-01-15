@@ -23,8 +23,8 @@
 #include <cmath>
 #include <boost/lexical_cast.hpp>
 
-#include "block.h"
-#include "fvec.h"
+#include <ttsoot/block.h>
+#include <ttsoot/fvec.h>
 
 template<typename T1, typename T2>
 class Container2 : public Block

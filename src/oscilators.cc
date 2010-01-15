@@ -18,7 +18,7 @@
  *
  */
 
-#include "oscilators.h"
+#include "ttsoot/oscilators.h"
 #include <cmath>
 
 SinOsc::SinOsc()

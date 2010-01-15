@@ -17,7 +17,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#ifndef GUI_ADJUSTMENT_H
+#define GUI_ADJUSTMENT_H
 
-#include "block.h"
+#include <gtkmm.h>
+#include "ttsoot/parammap.h"
 
-float Block::fs = 48000.0;
+class ParamAdjustment : public Gtk::Adjustment
+{
+    private:
+	Parameter &param;
+    public:
+	ParamAdjustment( Parameter & p );
+	void change_param();
+};
+
+#endif

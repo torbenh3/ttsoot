@@ -18,8 +18,8 @@
  *
  */
 
-#include "parammap.h"
-#include "block.h"
+#include "ttsoot/parammap.h"
+#include "ttsoot/block.h"
 #include <iostream>
 
 Parameter::Parameter( float *ptr, float de, float mi, float ma )

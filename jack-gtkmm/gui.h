@@ -20,7 +20,7 @@
 
 #include <memory>
 #include <gtkmm.h>
-#include "parammap.h"
+#include "ttsoot/parammap.h"
 
 
 class mainWin : public Gtk::Window
