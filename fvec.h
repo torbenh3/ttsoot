@@ -57,7 +57,7 @@ class fvec
 	    for( int i=0; i<(M-1); i++ )
 		_vec[i] = v1[i];
 	    for( int i=0; i<(N-M-1); i++ )
-		_vec[i+N] = v2[i];
+		_vec[i+M] = v2[i];
 	}
 
 	float & operator[] ( unsigned int index ) { return _vec[index]; }
