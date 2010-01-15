@@ -9,3 +9,10 @@ def build(bld):
 		uselib_local = "libttsoot jackgtkmm",
 		uselib = "GTKMM-2.4 JACK" )
 
+	bld.new_task_gen(
+		features = 'cxx cprogram',
+		source = 'funny_delay.cc',
+		target = 'funny_delay',
+		includes = "../",
+		uselib_local = "libttsoot jackgtkmm",
+		uselib = "GTKMM-2.4 JACK" )
