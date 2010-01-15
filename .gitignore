@@ -2,4 +2,7 @@
 .deps/
 ttsoot
 tests/
+.waf*
+build/
+.lock-wscript
 

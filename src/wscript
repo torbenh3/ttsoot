@@ -1,0 +1,11 @@
+#! /usr/bin/env python
+
+def build(bld):
+	bld.new_task_gen(
+		features = 'cxx cstaticlib',
+		source = 'basicblocks.cc block.cc filters.cc oscilators.cc parammap.cc',
+		target = 'libttsoot',
+		includes = "../" )
+
+	
+
