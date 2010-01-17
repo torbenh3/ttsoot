@@ -24,3 +24,11 @@ def build(bld):
 		includes = "../",
 		uselib_local = "libttsoot jackgtkmm",
 		uselib = "GTKMM-2.4 JACK" )
+
+	bld.new_task_gen(
+		features = 'cxx cshlib',
+		source = 'lv2delay.cc',
+		target = 'lv2delay',
+		includes = "../",
+		uselib_local = "libttsoot",
+		uselib = "" )
