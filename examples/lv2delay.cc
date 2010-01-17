@@ -18,13 +18,13 @@
  *
  */
 
-#include "lv2plugin/ttlv2plugin.h"
 #include <cmath>
 
 #include "ttsoot/block.h" 
 #include "ttsoot/filters.h"
 #include "ttsoot/basicblocks.h"
 #include "ttsoot/effects.h"
+#include "lv2plugin/ttlv2plugin.h"
 
 char  dparam_name[] = "delay";
 typedef VarDelay<8192, Sequence< Param<dparam_name>, Modulate<ConstInt<8191> >, Smooth> > delay_t;
