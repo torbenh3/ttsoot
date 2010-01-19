@@ -1,8 +1,29 @@
+/*
+ *  ttsoot - templated DSP graph composition library
+ *
+ *  Copyright (C) 2010  Torben Hohn <torbenh@gmx.de>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef TTLV2PLUGIN_HH
 #define TTLV2PLUGIN_HH
 
-#include "lv2plugin.h"
 #include "ttsoot/block.h"
+#include "lv2plugin/lv2plugin.h"
+#include "lv2plugin/mididata.h"
 
 typedef std::map<uint32_t,std::string> portmap_t;
 
@@ -44,5 +65,43 @@ class TTLV2Plugin : public LV2Plugin
 		out[i] = osc_block.process();
 	}
 };
+
+template<typename B, portmap_t * controlmap, portmap_t * bufmap >
+class TTLV2MidiPlugin : public TTLV2Plugin< B, controlmap, bufmap >
+{
+    public:
+	TTLV2MidiPlugin( double fs, const char *bundle_path, const LV2_Feature * const * features )
+	    : TTLV2MidiPlugin< B, controlmap, bufmap > ( fs, bundle_path, features )
+	{ }
+
+	virtual void note_on ( uint8_t note, uint8_t vel ) {
+	    printf( "note_on %d, %d \n", (uint32_t)  note, (uint32_t) vel );
+	}
+	virtual void note_off( uint8_t note, uint8_t vel ) {
+	    printf( "note_off %d, %d \n", (uint32_t)  note, (uint32_t) vel );
+	}
+
+	void run( uint32_t nframes )
+	{
+	    float *out = this->ports.get_buffer( 0 );
+	    LV2MidiEventBuf *evbuf = this->ports.get_midi_buf(1);
+	    for( auto i=evbuf->begin(); i != evbuf->end(); ++i )
+	    {
+		LV2Event<LV2MidiData> mev = *i;
+		if( mev.get_data().size == 3 ) {
+		    if( mev.get_data().data[0] == 0x90 )
+			note_on( mev.get_data().data[1], mev.get_data().data[2] );
+		    if( mev.get_data().data[0] == 0x80 )
+			note_off( mev.get_data().data[1], mev.get_data().data[2] );
+		}
+	    }
+	    this->setup_params();
+	    this->osc_block.prep();
+	    for( int i=0; i<nframes; i++ )
+		out[i] = this->osc_block.process();
+	}
+};
+
+
 
 #endif
