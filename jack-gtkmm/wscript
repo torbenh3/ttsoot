@@ -7,7 +7,7 @@ def configure(conf):
 def build(bld):
 	bld.new_task_gen(
 		features = 'cxx cstaticlib',
-		source = 'gui.cc gui_adjustment.cc gui_knob.cc gui_slider.cc main.cc',
+		source = 'gui.cc gui_adjustment.cc gui_knob.cc gui_slider.cc gui_meter.cc main.cc',
 		target = 'jackgtkmm',
 		includes = "../",
 		uselib = "GTKMM-2.4 JACK")

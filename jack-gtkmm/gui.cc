@@ -23,6 +23,7 @@
 #include "gui_adjustment.h"
 #include "gui_knob.h"
 #include "gui_slider.h"
+#include "gui_meter.h"
 
 mainWin::mainWin( paramMap & params )
     : _params( params )
@@ -31,7 +32,8 @@ mainWin::mainWin( paramMap & params )
 	Parameter &param = i->second;
 	Glib::RefPtr<Gtk::Adjustment> adj = Glib::RefPtr<Gtk::Adjustment>( new ParamAdjustment( param ) );
 	//std::shared_ptr<Gtk::VScale> scal( new Gtk::VScale (*adj) );
-	std::shared_ptr<GUIFramedSlider> scal( new GUIFramedSlider ( adj ) );
+	//std::shared_ptr<GUIFramedSlider> scal( new GUIFramedSlider ( adj ) );
+	std::shared_ptr<GUIFramedMeter> scal( new GUIFramedMeter ( adj ) );
 
 	//scal->set_digits( 3 ); 
         _hbox.pack_start( *scal );
