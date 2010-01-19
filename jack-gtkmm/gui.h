@@ -21,6 +21,7 @@
 #include <memory>
 #include <gtkmm.h>
 #include "ttsoot/parammap.h"
+#include "gui_knob.h"
 
 
 class mainWin : public Gtk::Window
@@ -28,7 +29,8 @@ class mainWin : public Gtk::Window
     private:
 	Gtk::HBox _hbox;
 
-	std::list<std::shared_ptr<Gtk::VScale>> scale_list;
+	//std::list<std::shared_ptr<Gtk::VScale>> scale_list;
+	std::list<std::shared_ptr<GUIKnob>> scale_list;
 	paramMap &_params;
 
     public:

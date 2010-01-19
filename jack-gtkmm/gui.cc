@@ -21,16 +21,18 @@
 #include "gui.h"
 #include <boost/bind.hpp>
 #include "gui_adjustment.h"
+#include "gui_knob.h"
 
 mainWin::mainWin( paramMap & params )
     : _params( params )
 {
     for( auto i=params.begin(); i!=params.end(); i++ ) {
 	Parameter &param = i->second;
-	Gtk::Adjustment *adj = Gtk::manage( new ParamAdjustment( param ) );
-	std::shared_ptr<Gtk::VScale> scal( new Gtk::VScale (*adj) );
+	Glib::RefPtr<Gtk::Adjustment> adj = Glib::RefPtr<Gtk::Adjustment>( new ParamAdjustment( param ) );
+	//std::shared_ptr<Gtk::VScale> scal( new Gtk::VScale (*adj) );
+	std::shared_ptr<GUIKnob> scal( new GUIKnob ( adj ) );
 
-	scal->set_digits( 3 ); 
+	//scal->set_digits( 3 ); 
         _hbox.pack_start( *scal );
 	scale_list.push_back( scal );
 	scal->set_tooltip_text( i->first );
