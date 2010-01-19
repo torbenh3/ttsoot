@@ -30,7 +30,7 @@ class mainWin : public Gtk::Window
 	Gtk::HBox _hbox;
 
 	//std::list<std::shared_ptr<Gtk::VScale>> scale_list;
-	std::list<std::shared_ptr<GUIKnob>> scale_list;
+	std::list<std::shared_ptr<Gtk::Widget>> scale_list;
 	paramMap &_params;
 
     public:
