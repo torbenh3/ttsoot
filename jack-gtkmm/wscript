@@ -12,3 +12,18 @@ def build(bld):
 		includes = "../",
 		uselib = "GTKMM-2.4 JACK")
 
+	bld.new_task_gen(
+		features = 'cxx cstaticlib',
+		source = 'gui_adjustment.cc gui_knob.cc gui_slider.cc gui_meter.cc',
+		target = 'ttgui',
+		includes = "../",
+		uselib = "GTKMM-2.4 JACK")
+
+	bld.new_task_gen(
+		features = 'cxx cprogram',
+		source = 'ttm.cc ttm_engine.cc ttm_gui.cc',
+		target = 'ttm',
+		includes = "../",
+		uselib_local = "ttgui",
+		uselib = "GTKMM-2.4 JACK" )
+
