@@ -36,9 +36,9 @@ class TTMChannelGUI : public Gtk::Table
     public:
 	TTMChannelGUI( const std::string & name, TTMChannel *c )
 	    : chan(c)
-	    , Table( 20, 10, true )
+	    , Table( 20, 10, false )
 	    , metadj ( -90, -90, 12 )
-	    , gainadj( 0, -90, 12 )
+	    , gainadj( 0, -60, 12 )
 	    , meter(Glib::RefPtr<Gtk::Adjustment>(&metadj))
 	    , gain(Glib::RefPtr<Gtk::Adjustment>(&gainadj))
 	    , label_name( name )
@@ -58,6 +58,8 @@ class TTMChannelGUI : public Gtk::Table
 	    label_name.show();
 	    label_peak.show();
 	    label_gain.show();
+
+	    set_size_request(50,150);
 	}
 
 	void update_meter()
@@ -80,7 +82,6 @@ class TTMChannelGUI : public Gtk::Table
 		label_peak.set_text( cbuf );
 		
 	    }
-
 	}
 
 	void gain_change()
@@ -92,15 +93,34 @@ class TTMChannelGUI : public Gtk::Table
 	    else
 		gain = std::pow( 10.0, dB/10.0 );
 
+	    char cbuf[16];
 	    chan->gain = gain;
+	    snprintf( cbuf, 16, "%+2.2f", (double) dB );
+	    label_gain.set_text( cbuf );
 	}
+};
+
+class TTMWindow;
+
+class TTMChannelRow : public Gtk::HBox
+{
+    private:
+	Gtk::VBox buttonbox;
+	TTMWindow &win;
+	Gtk::ScrolledWindow swin;
+	Gtk::HBox swin_hbox;
+    public:
+	TTMChannelRow( TTMWindow & w );
+
+	void add_channel();
 };
 
 class TTMWindow : public Gtk::Window
 {
     private:
 	Gtk::VBox vbox;
-	Gtk::HBox main_area;
+	Gtk::ScrolledWindow swin;
+	Gtk::VBox swin_vbox;
 	Glib::RefPtr<Gtk::ActionGroup> action_group;
 	Glib::RefPtr<Gtk::UIManager> ui_manager;
 
@@ -116,33 +136,44 @@ class TTMWindow : public Gtk::Window
 	    chan_id = 0;
 	    action_group = Gtk::ActionGroup::create();
 	    action_group->add( Gtk::Action::create( "Add", Gtk::Stock::ADD ),
-		    sigc::mem_fun( *this, &TTMWindow::add_channel ) );
+		    sigc::mem_fun( *this, &TTMWindow::add_row ) );
 	    ui_manager = Gtk::UIManager::create();
 	    ui_manager->insert_action_group( action_group );
 	    ui_manager->add_ui_from_string( ui_info );
 
 	    Gtk::Widget *toolbar = ui_manager->get_widget( "/ToolBar" );
-	    vbox.add( *toolbar );
-	    vbox.add( main_area );
+	    vbox.pack_start( *toolbar, Gtk::PACK_SHRINK );
 	    toolbar->show();
-	    main_area.show();
 
 	    Glib::signal_timeout().connect( sigc::mem_fun( *this, &TTMWindow::update_all_meters ),100 );
 
 	    add(vbox);
 	    vbox.show();
+
+	    vbox.add(swin);
+	    swin.show();
+	    swin.set_policy( Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC );
+	    swin.add( swin_vbox );
+	    swin_vbox.show();
+
 	    show();
 	}
 
-	void add_channel()
+	void add_row()
+	{
+	    TTMChannelRow *row = Gtk::manage( new TTMChannelRow( *this ) );
+	    swin_vbox.pack_start( *row, Gtk::PACK_SHRINK );
+	    row->show();
+	}
+	
+	TTMChannelGUI * create_channel()
        	{
 	    std::string name = boost::lexical_cast<std::string>( chan_id++ );
 	    
 	    TTMChannel    *ch     = eng.add_channel( name );
 	    TTMChannelGUI *ch_gui = new TTMChannelGUI( name, ch );
-	    main_area.add(*ch_gui);
 	    chan_list.push_back( Glib::RefPtr<TTMChannelGUI>(ch_gui) );
-	    ch_gui->show();
+	    return ch_gui;
 	}
 
 	bool update_all_meters()

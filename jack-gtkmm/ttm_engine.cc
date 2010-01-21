@@ -5,7 +5,7 @@
 
 TTMChannel::TTMChannel( TTMEngine &e, const std::string & n )
     : eng(e)
-    , gain(0.0)
+    , gain(1.0)
     , rms(0.0)
     , peak(0.0)
     , mute(false)

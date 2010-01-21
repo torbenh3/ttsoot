@@ -56,7 +56,7 @@ GUIMeter::check_for_redraw()
     double range = adjustment->get_upper() - adjustment->get_lower();
     double pos   = adjustment->get_value() - adjustment->get_lower();
     int pix_hi = pos/range * (double) (num_leds);
-    
+
     if( pix_hi == last_draw )
 	return;
 
