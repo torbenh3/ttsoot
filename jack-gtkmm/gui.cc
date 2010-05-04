@@ -23,7 +23,9 @@
 #include "gui_adjustment.h"
 #include "gui_knob.h"
 #include "gui_slider.h"
-#include "gui_meter.h"
+#include "jack-gtkmm/gui_meter.h"
+#include "jack-gtkmm/ttm_gui.h"
+
 
 mainWin::mainWin( paramMap & params )
     : _params( params )
@@ -34,6 +36,7 @@ mainWin::mainWin( paramMap & params )
 	//std::shared_ptr<Gtk::VScale> scal( new Gtk::VScale (*adj) );
 	//std::shared_ptr<GUIFramedSlider> scal( new GUIFramedSlider ( adj ) );
 	std::shared_ptr<GUIFramedMeter> scal( new GUIFramedMeter ( adj ) );
+	//std::shared_ptr<TTMChannelGUI> scal( new TTMChannelGUI ( "chan" ) );
 
 	//scal->set_digits( 3 ); 
         _hbox.pack_start( *scal );
