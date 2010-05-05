@@ -84,15 +84,15 @@ class TTLV2MidiPlugin : public TTLV2Plugin< B, controlmap, bufmap >
 	void run( uint32_t nframes )
 	{
 	    float *out = this->ports.get_buffer( 0 );
-	    LV2MidiEventBuf *evbuf = this->ports.get_midi_buf(1);
+	    LV2EventBuf *evbuf = this->ports.get_midi_buf(1);
 	    for( auto i=evbuf->begin(); i != evbuf->end(); ++i )
 	    {
-		LV2Event<LV2MidiData> mev = *i;
-		if( mev.get_data().size == 3 ) {
-		    if( mev.get_data().data[0] == 0x90 )
-			note_on( mev.get_data().data[1], mev.get_data().data[2] );
-		    if( mev.get_data().data[0] == 0x80 )
-			note_off( mev.get_data().data[1], mev.get_data().data[2] );
+		LV2MidiData mev = i->get<LV2MidiData>();
+		if( mev.size == 3 ) {
+		    if( mev.data[0] == 0x90 )
+			note_on( mev.data[1], mev.data[2] );
+		    if( mev.data[0] == 0x80 )
+			note_off( mev.data[1], mev.data[2] );
 		}
 	    }
 	    this->setup_params();

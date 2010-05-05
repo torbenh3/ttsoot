@@ -35,6 +35,4 @@ class LV2MidiData
 	{}
 };
 
-typedef LV2EventBuf<LV2MidiData> LV2MidiEventBuf ;
-
 #endif

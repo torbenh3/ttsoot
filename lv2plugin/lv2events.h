@@ -4,26 +4,25 @@
 
 #include "lv2/event.h"
 
-template<typename T>
 class LV2Event : public LV2_Event
 {
     private:
     public:
-	T get_data() {
+        template<typename T>
+	T get() {
 	    char *c_ptr = (char *) this;
 	    c_ptr += sizeof( LV2_Event );
 	    return T( c_ptr, size );
 	}
 };
 
-template<typename T>
 class LV2EventIter
 {
     private:
-	char *data;
+	uint8_t *data;
 	uint32_t   num;
     public:
-	LV2EventIter( char *d, uint32_t n )
+	LV2EventIter( uint8_t *d, uint32_t n )
 	   : data(d)
 	   , num(n)
 	{}
@@ -43,22 +42,25 @@ class LV2EventIter
 	    return *this;
 	}
 
-	LV2Event<T> & operator*() {
-	    return * static_cast< LV2Event<T> >(data);
+	LV2Event & operator*() {
+	    return * reinterpret_cast< LV2Event *>(data);
+	}
+
+	LV2Event * operator->() {
+	    return reinterpret_cast< LV2Event *>(data);
 	}
 };
 
-template<typename T>
 class LV2EventBuf : public LV2_Event_Buffer
 {
     private:
     public:
-	LV2EventIter<T> begin() {
-	    return LV2EventIter<T>( data, 0 );
+	LV2EventIter begin() {
+	    return LV2EventIter( data, 0 );
 	}
 
-	LV2EventIter<T> end() {
-	    return LV2EventIter<T>( 0, event_count );
+	LV2EventIter end() {
+	    return LV2EventIter( 0, event_count );
 	}
 };
 

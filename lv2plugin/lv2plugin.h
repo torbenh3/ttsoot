@@ -24,7 +24,7 @@
 #include <lv2.h>
 #include <vector>
 
-#include "lv2plugin/mididata.h"
+class LV2EventBuf;
 
 template<typename P>
 class LV2Desc : public LV2_Descriptor
@@ -100,6 +100,10 @@ class PortVector : public std::vector<void *>
     public:
 	float * get_buffer( uint32_t port ) {
 	    return (float *) at(port);
+	}
+
+	LV2EventBuf * get_event_buffer( uint32_t port ) {
+	    return (LV2EventBuf *) at(port);
 	}
 
 	float get_control( uint32_t port ) {
