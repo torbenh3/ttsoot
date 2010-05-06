@@ -6,13 +6,12 @@
 
 class LV2Event : public LV2_Event
 {
-    private:
     public:
         template<typename T>
 	T get() {
 	    char *c_ptr = (char *) this;
 	    c_ptr += sizeof( LV2_Event );
-	    return T( c_ptr, size );
+	    return T( c_ptr, size, type );
 	}
 };
 
