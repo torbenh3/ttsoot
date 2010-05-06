@@ -25,6 +25,8 @@
 #include "lv2plugin/lv2plugin.h"
 #include "lv2plugin/mididata.h"
 
+#include "lv2plugin/lv2atom.h"
+
 typedef std::map<uint32_t,std::string> portmap_t;
 
 template<typename B, portmap_t * controlmap, portmap_t * bufmap >
