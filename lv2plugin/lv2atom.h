@@ -300,6 +300,195 @@ class LV2Triples<> : public LV2Atom
         LV2TriplesIter end() { return LV2TriplesIter( data+size ); }
 };
 
+struct LV2BlankItem
+{
+    uint32_t predicate;
+    LV2_Atom object;
+};
+
+template<typename T>
+class LV2AtomBlankItem : public LV2Atom
+{
+    private:
+        uint32_t predicate;
+        T object;
+
+    public:
+        static int cache_id;
+
+        LV2AtomBlankItem( uint8_t *d, uint32_t s, uint32_t t )
+            : LV2Atom(d,s,t)
+        {}
+
+        LV2AtomBlankItem( uint32_t p, T o )
+            : LV2Atom()
+            , predicate(p)
+            , object(o)
+        {}
+
+        uint32_t get_predicate()
+        {
+            if (!type_valid)
+                return predicate;
+            else 
+            {
+                LV2Triple *triple = (LV2Triple *) data;
+                return triple->predicate;
+            }
+        }
+
+        T get_object()
+        {
+            if (!type_valid)
+                return object;
+            else 
+            {
+                LV2Triple *triple = (LV2Triple *) data;
+                return T( triple->object.body, triple->object.size, triple->object.type );
+            }
+        }
+
+        size_t write_body( uint8_t *dst, const std::vector<uint32_t> & uri_cache )
+        {
+            LV2BlankItem *bitem = (LV2BlankItem *) dst;
+            bitem->predicate = predicate;
+            int sz = object.write( &bitem->object, uri_cache );
+
+            sz += 1 * sizeof(uint32_t);
+            
+            return sz;
+        }
+
+        size_t write( uint8_t *dst, const std::vector<uint32_t> & uri_cache )
+        {
+            LV2_Atom *atom = (LV2_Atom *) dst;
+            atom->type = uri_cache[cache_id];
+
+            int sz = write_body( atom->body, uri_cache );
+
+            atom->size = sz;
+            
+            return ((atom->size+3)&(~3)) + 2 * sizeof(uint16_t);
+        }
+
+};
+template <typename ... Args>
+class LV2AtomBlank;
+
+template <typename T, typename ... Args>
+class LV2AtomBlank<T, Args...>
+{
+    private:
+        T head;
+        LV2AtomBlank<Args...> tail;
+
+    public:
+        static int cache_id;
+
+        LV2AtomBlank(T h, Args & ... t)
+            : head(h)
+            , tail(t...)
+        {}
+
+        size_t write_body( uint8_t *dst, const std::vector<uint32_t> & uri_cache )
+        {
+            int sz = head.write_body( dst, uri_cache );
+            sz += tail.write_body( dst + sz, uri_cache );
+
+            return sz;
+        }
+
+        size_t write( uint8_t *dst, const std::vector<uint32_t> & uri_cache )
+        {
+            LV2_Atom *atom = (LV2_Atom *) dst;
+            atom->type = uri_cache[cache_id];
+
+            int sz = write_body( atom->body, uri_cache );
+            atom->size = sz;
+
+            return ((atom->size+3)&(~3)) + 2 * sizeof(uint16_t);
+        }
+
+};
+
+template <typename T>
+class LV2AtomBlank<T>
+{
+    private:
+        T head;
+
+    public:
+        static int cache_id;
+
+        LV2AtomBlank(T h)
+            : head(h)
+        {}
+
+        size_t write_body( uint8_t *dst, const std::vector<uint32_t> & uri_cache )
+        {
+            int sz = head.write_body( dst, uri_cache );
+
+            return sz;
+        }
+
+        size_t write( uint8_t *dst, const std::vector<uint32_t> & uri_cache )
+        {
+            LV2_Atom *atom = (LV2_Atom *) dst;
+            atom->type = uri_cache[cache_id];
+
+            int sz = write_body( atom->body, uri_cache );
+            atom->size = sz;
+
+            return ((atom->size+3)&(~3)) + 2 * sizeof(uint16_t);
+        }
+
+};
+
+class LV2BlankIter
+{
+    private:
+	uint8_t *data;
+    public:
+	LV2BlankIter( uint8_t *d )
+	   : data(d)
+	{}
+
+	bool operator != ( const LV2BlankIter &other ) {
+	    return data != other.data;
+	}
+
+	LV2BlankIter & operator++() {
+	    LV2BlankItem * bitem = (LV2BlankItem *) data;
+	    uint32_t offset = sizeof(LV2BlankItem) + bitem->object.size;
+	    offset = offset+3 & (~3);
+
+	    data  += offset;
+
+	    return *this;
+	}
+
+	LV2AtomBlankItem<LV2Atom> operator*() {
+	    return LV2AtomBlankItem<LV2Atom>(data, 0, 0);
+	}
+};
+
+template <>
+class LV2AtomBlank<> : public LV2Atom
+{
+    public:
+	LV2AtomBlank( uint8_t *d, uint32_t s, uint32_t t )
+            : LV2Atom(d,s,t)
+        {}
+
+        LV2BlankIter begin() { return LV2BlankIter( data ); }
+        LV2BlankIter end() { return LV2BlankIter( data+size ); }
+};
+
+
+
+
+
+
 template <typename T>
 class LV2AtomVector : public LV2Atom
 {
